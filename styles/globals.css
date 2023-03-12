@@ -1,0 +1,230 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  --color-white:255 255 255;
+  --color-dark: 30 30 36;
+  --color-black: 0 0 0;
+  --color-placeholder: 102 102 102,
+  color: #1E1E24;
+  scroll-behavior: smooth;
+  --swiper-navigation-size: 20px,
+
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+h1, h2, h3, h4, a, button, li {
+  font-family: 'Open Sans', sans-serif;
+}
+/* p, div {
+  text-align: justify;
+} */
+.nav-item {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  padding-bottom: 5px;
+}
+.nav-item::after {
+  content: "";
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  height: 3px;
+  background-color: #1E1E24;
+  transform: scaleX(0);
+  transition: transform 0.3s ease-in;
+  transform-origin: right;
+  
+}
+.nav-item:hover:after  {
+  transform: scaleX(1);
+  transform-origin: left;
+  transition: transform 0.3s ease-out;
+}
+.nav-item-foot {
+  position: relative;
+  display: flex;
+  overflow: hidden;
+  padding-bottom: 5px;
+  width: fit-content;
+}
+.nav-item-foot::after {
+  content: "";
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+  width: 100%;
+  height: 3px;
+  background-color: rgba(255,255,255,0.8);
+  transform: scaleX(0);
+  transition: transform 0.3s ease-in;
+  transform-origin: right;
+  
+}
+.nav-item-foot:hover:after  {
+  transform: scaleX(1);
+  transform-origin: left;
+  transition: transform 0.3s ease-out;
+}
+.button {
+  border: none;
+  outline: none;
+  background: none;
+  padding: 10px 20px;
+  position: relative;
+  border-radius: 2px;
+  margin-left: 64px;
+}
+.left {
+  height: 100%;
+  width: 2px;
+  background-color: #1E1E24;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.3s ease-out;
+}
+.right {
+  height: 100%;
+  width: 2px;
+  background-color: #1E1E24;
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  transform: scaleY(0);
+  transform-origin: top;
+  transition: transform 0.3s ease-out 0.3s;
+}
+.button::before {
+  content: "";
+  height: 2px;
+  width: 100%;
+  background-color: #1E1E24;
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease-out 0.3s;
+}
+.button::after {
+  content: "";
+  height: 2px;
+  width: 100%;
+  background-color: #1E1E24;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s ease-out;
+}
+
+  .button:hover .left{
+      transform-origin: bottom;
+      transform: scaleY(1);
+      transition: transform 0.3s ease-out;
+  }
+  .button:hover .right {
+      transform-origin: bottom;
+      transform: scaleY(1);
+      transition: transform 0.3s ease-out 0.3s;
+  }
+  .button:hover::before {
+      transform: scaleX(1);
+      transform-origin: left;
+      transition: transform 0.3s ease-out 0.3s;
+  }
+  .button:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+      transition: transform 0.3s ease-out;
+  }
+.login-container {
+  background: url("/assets/login.jpg") fixed no-repeat;
+  background-size: cover;
+}
+.dossier-container::-webkit-scrollbar {
+  width: 15px;
+}
+.dossier-container::-webkit-scrollbar-track {
+  background: #D9D9D9;
+  border-radius: 20px;
+}
+.dossier-container::-webkit-scrollbar-thumb {
+  background: #010203;
+  border-radius: 20px;
+}
+.swiper {
+  padding: 30px 0 !important;
+}
+.swiper-wrapper {
+  padding: 0 0px 25px;
+  align-items: stretch;
+}
+.swiper-slide {
+  height: auto !important;
+  display: flex;
+  
+}
+.swiper-pagination {
+  bottom: 0;
+}
+.side-el {
+  position: relative;
+  transition:all .4s ease-out;
+}
+.side-el::after {
+  position: absolute;
+  border-radius: 0.5rem;
+  color: rgb(30,30,36);
+	background: #E8BF28;
+  font-size: 0.8rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+	top:0;
+	left: 100%;
+	width: 100%;
+  height: 100%;
+  opacity:.5;
+  transform: perspective(400px) rotateY(90deg);
+	transform-origin: 0 100%;
+	transition:all .4s ease-out;
+  word-wrap: break-word;
+}
+.side-el:hover {
+  transform: translate(-100%);
+}
+.side-el:hover::after{
+  opacity: 1;
+	transform: perspective(400px) rotateY(0deg) scale(1) ;
+}
+.file{
+  padding: 10px 20px;
+  background-color: #e2e2ee;
+  color: #333;
+  border-radius: 10px;
+  cursor: pointer;
+
+}
+.file:hover {
+  background-color: #d2d2de;
+}
