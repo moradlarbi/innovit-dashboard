@@ -12,6 +12,33 @@ import AppContext from "../lib/AppContext";
 const clientSideEmotionCache = createEmotionCache();
 
 export default function MyApp(props) {
+  const overridedLightTheme = {
+    ...theme,
+    palette: {
+        ...theme.palette,
+        primary: {
+            main: "#11B07A",
+            contrastText: "#fff"
+        },
+        // secondary: {
+        //     main: "#fff",
+        //     secondary: "#000",
+        //     contrastText: "#000"
+        // },
+        // third: {
+        //   main: "#F9A400"
+        // },
+        // error: {
+        //   main: "#C80000",
+        //   lighter: "#FFE8E8"
+        // },
+        // text: {
+        //   disabled: "#c1c1c1",
+        //   primary: "#000",
+        //   secondary: "#373737",
+        // }
+    },
+};
   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props;
   const getLayout = Component.getLayout || ((page) => page);
   const [user, setUser] = useState();
@@ -20,7 +47,7 @@ export default function MyApp(props) {
       <Head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
-      <ThemeProvider theme={theme}>
+      <ThemeProvider theme={overridedLightTheme}>
         {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
         <CssBaseline />
         <AppContext.Provider
