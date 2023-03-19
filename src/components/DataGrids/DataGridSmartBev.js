@@ -75,7 +75,7 @@ export default function DataGridSmartBev({
         getData()
       }, [ refreshParent, refresh])
   return (
-    <Box sx={{ height: 800, width: '100%', padding:"15px 10px", }}>
+    <Box sx={{ height: 500, width: '100%', padding:"15px 10px", }}>
       {/* The Dialog Section */}
       {/* Dialog Button */}
       {info?.title && <h1>{info?.title}</h1>}
@@ -83,12 +83,11 @@ export default function DataGridSmartBev({
       {add && (
         <>
         <Box sx={{display:"flex", alignItems:"center", width:"100%", justifyContent:"space-between", margin:"20px 0"}}>
-        
         <TextField
             id="input-with-icon-textfield"
             label="Rechercher"
             name="recherche"
-            placeholder="Rechercher un produit"
+            placeholder="Rechercher un distributeur"
             style={{maxWidth:"700px", flex:"auto", background: "#ffffff"}}
             onChange={(e) => {
               setRecherche(e.target.value)
@@ -169,7 +168,10 @@ export default function DataGridSmartBev({
               <Button
                 variant="contained"
                 onClick={() => {
-                  if (addFunction) addFunction(states, client)
+
+                  if (addFunction) addFunction(states)
+                  handleClose()
+
                 }}
               >
                 Enregistrer
@@ -203,7 +205,7 @@ export default function DataGridSmartBev({
             </>
           ))}
           {columns
-                ?.filter((e) => e.add && e.type=="select")
+                ?.filter((e) => e.edit && e.type=="select")
                 .map((column) => (
                   <Select
                     key={column.id}
@@ -230,6 +232,7 @@ export default function DataGridSmartBev({
             if (editFunction){
               console.log("-----",client);
               editFunction(item,client)
+              handleCloseUpdate()
             }
             handleCloseUpdate()
           }}>Mettre a jour</Button>
