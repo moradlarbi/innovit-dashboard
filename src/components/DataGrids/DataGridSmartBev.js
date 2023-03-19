@@ -30,7 +30,8 @@ export default function DataGridSmartBev({
   }
   const handleChangeSelect = (event) => {
     setClient(event.target.value);
-    setRefresh(!refresh);
+    setRefresh(!refresh)
+
   };
   //Update dependacies
   
@@ -167,8 +168,10 @@ export default function DataGridSmartBev({
               <Button
                 variant="contained"
                 onClick={() => {
+
                   if (addFunction) addFunction(states)
                   handleClose()
+
                 }}
               >
                 Enregistrer
@@ -249,7 +252,7 @@ export default function DataGridSmartBev({
           },
         }}
         pageSizeOptions={[5]}
-        checkboxSelection
+        checkboxSelection={false}
         disableRowSelectionOnClick
       />
     </Box>

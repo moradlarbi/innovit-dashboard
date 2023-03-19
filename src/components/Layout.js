@@ -3,6 +3,7 @@ import Header from "./Header"
 import { useContext, useEffect, useState } from "react";
 import AppContext from "../../lib/AppContext";
 import { useRouter } from "next/router";
+import {Box} from '@mui/material';
 // import AppContext from "../lib/AppContext";
 import Loading from "./Loading";
 export default function Layout({ children }) {
@@ -38,12 +39,17 @@ export default function Layout({ children }) {
     return <Loading />;
   }
   return (
-    <div className="flex flex-col" style={{ minHeight: "100vh" }}>
-      <Header className=" flex-1" />
-      <div className="flex-auto flex w-full flex-col md:flex-row bg-dark gap-5 md:gap-20 py-8 md:py-16 px-4 md:px-12">
+    <div style={{ minHeight: "100vh",position:"relative" }}>
+      
+      <Box sx={{display:"flex", width:"100%", height:"100%",gap:"20px"}}>
         <Sidebar />
-        <main className="flex-auto">{children}</main>
-      </div>
+        <Box sx={{flex:"auto"}}>
+          <Header className=" flex-1" />
+          <main style={{flex:"auto"}}>{children}</main>
+        </Box>
+        
+      </Box>
+
     </div>
   );
 }
