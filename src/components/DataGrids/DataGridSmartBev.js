@@ -5,7 +5,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import axios from 'axios';
 import SearchIcon from '@mui/icons-material/Search';
 export default function DataGridSmartBev({
-    fetchurl,addFunction,editFunction,columns,info,refreshParent, add,edit,item,
+    fetchUrl,addFunction,editFunction,columns,info,refreshParent, add,edit,item,
     setItem,
     openUpdate,
     setOpenUpdate
@@ -31,6 +31,7 @@ export default function DataGridSmartBev({
   const handleChangeSelect = (event) => {
     setClient(event.target.value);
     setRefresh(!refresh)
+
   };
   //Update dependacies
   
@@ -41,13 +42,16 @@ export default function DataGridSmartBev({
     setOpenUpdate(false);
   };
     const getData = () => {
+      console.log(fetchUrl);
+     
       axios
       .get(
-        `${fetchurl}`
+        `${fetchUrl}`
       )
       .then((res) => {
         if (res.status == 200) {
           setRows(res.data)
+          console.log(res.data)
         }
       })
       .catch((e) => {
@@ -55,28 +59,17 @@ export default function DataGridSmartBev({
       })
       axios
       .get(
-        `http://localhost:3001/api/roles`
+        `http://localhost:5000/dashboard/users`
       )
       .then((res) => {
         if (res.status == 200) {
+          console.log(res.data);
           setSelectValues(res.data)
         }
       })
       .catch((e) => {
         console.log(e)
       })
-        setRows( [
-            { id: 1, name: 'Snow', client: 'Jon', goblet: 35, spoon: 12, sugar: 4, pack:"pack1" },
-            { id: 2, name: 'Lannister', client: 'Cersei', goblet: 42, spoon: 12, sugar: 4,pack:"pack1" },
-            { id: 3, name: 'Lannister', client: 'Jaime', goblet: 45, spoon: 12, sugar: 4,pack:"pack1" },
-            { id: 4, name: 'Stark', client: 'Arya', goblet: 16, spoon: 12, sugar: 4, pack:"pack1" },
-            { id: 5, name: 'Targaryen', client: 'Daenerys', goblet: 41, spoon: 12, sugar: 4, pack:"pack1" },
-            { id: 6, name: 'Melisandre', client: null, goblet: 15, spoon: 12, sugar: 40, pack:"pack1" },
-            { id: 7, name: 'Clifford', client: 'Ferrara', goblet: 44, spoon: 12, sugar: 4, pack:"pack1" },
-            { id: 8, name: 'Frances', client: 'Rossini', goblet: 36, spoon: 12, sugar: 4, pack:"pack1" },
-            { id: 9, name: 'Roxie', client: 'Harvey', goblet: 65, spoon: 12, sugar: 4 , pack:"pack1"},
-          ])
-          setSelectValues([{id: 1,label:"Client1"},{id: 2,label:"Client2"},{id: 3,label:"Client3"},])
       }
       React.useEffect(() => {
         getData()
@@ -156,7 +149,7 @@ export default function DataGridSmartBev({
                   >
                     {selectValues.map((v) => {
                         return (
-                            <MenuItem value={v.id}>{v.label}</MenuItem>
+                            <MenuItem value={v.id}>{v.nom}</MenuItem>
                         )
                     })}
                     
@@ -222,7 +215,7 @@ export default function DataGridSmartBev({
                   >
                     {selectValues.map((v) => {
                         return (
-                            <MenuItem value={v.id}>{v.label}</MenuItem>
+                            <MenuItem value={v.id}>{v.nom}</MenuItem>
                         )
                     })}
                     
@@ -235,7 +228,8 @@ export default function DataGridSmartBev({
           <Button onClick={handleCloseUpdate}>Annuler</Button>
           <Button onClick={() => {
             if (editFunction){
-              editFunction(item)
+              console.log("-----",client);
+              editFunction(item,client)
             }
             handleCloseUpdate()
           }}>Mettre a jour</Button>

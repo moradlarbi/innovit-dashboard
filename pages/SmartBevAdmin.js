@@ -42,7 +42,7 @@ const SmartBevAdmin = () => {
       edit: true,
     },
     {
-      field: 'goblet',
+      field: 'capaciteGoblet',
       headerName: 'Goblet',
       type: 'number',
       editable: false,
@@ -50,7 +50,7 @@ const SmartBevAdmin = () => {
       edit: true,
     },
     {
-      field: 'sugar',
+      field: 'capaciteSucre',
       headerName: 'Sugar',
       type: 'number',
       editable: false,
@@ -58,7 +58,7 @@ const SmartBevAdmin = () => {
       edit: true,
     },
     {
-      field: 'spoon',
+      field: 'capaciteSpoon',
       headerName: 'Spoon',
       type: 'number',
       editable: false,
@@ -108,10 +108,21 @@ const SmartBevAdmin = () => {
       }
     }
   ];
+
   const addOne = (values,client) => {
     console.log(client)
     axios.post('http://localhost:3001/book', values).then((res) => {
       if (res.status === 201) {
+
+  const addOne = (values) => {
+    console.log(values);
+    axios.post('http://localhost:5000/dashboard/distributeurs/add', {
+      capaciteGoblet : parseInt(values.capaciteGoblet),
+      capaciteSucre : parseInt(values.capaciteSucre),
+      capaciteSpoon : parseInt(values.capaciteSpoon),
+    }).then((res) => {
+      if (res.status === 200) {
+
         Swal.fire({
           position: "center",
           icon: "success",
@@ -140,6 +151,7 @@ const SmartBevAdmin = () => {
         });
       }
         })
+        
     
         console.log(values)
   }
@@ -186,8 +198,13 @@ const SmartBevAdmin = () => {
     })
     
   };
-  const updateOne = (values) => {
-    axios.put(`http://localhost:3001/api/${values.id}`, values).then((res) => {
+  const updateOne = (values,idClient) => {
+    axios.put(`http://localhost:5000/dashboard/distributeur/edit/${values.id}`, {
+      capaciteGoblet : parseInt(values.capaciteGoblet),
+      capaciteSucre : parseInt(values.capaciteSucre),
+      capaciteSpoon : parseInt(values.capaciteSpoon),
+      idUser:parseInt(idClient)
+    }).then((res) => {
           if (res.status === 200) {
             Swal.fire({
               position: "center",
@@ -211,13 +228,46 @@ const SmartBevAdmin = () => {
             }
            } 
         })
+        axios.post(`http://localhost:5000/dashboard/distributeurs/attr/${values.id}`, {
+          idUser:parseInt(idClient)
+        }).then((res) => {
+          if (res.status === 200) {
+            Swal.fire({
+              position: "center",
+              icon: "success",
+              title: `${values.name} a bien été ajouté`,
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            setrefresh(!refresh)
+          } else if (res.status === 400) {
+            Swal.fire({
+              position: "top-end",
+              icon: "error",
+              title: `${values.name} n'a pas été ajouté`,
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            console.log('bad req')
+          }
+          else {
+            Swal.fire({
+              position: "top-end",
+              icon: "error",
+              title: `${values.name} n'a pas été ajouté`,
+              showConfirmButton: false,
+              timer: 1500,
+            });
+          }
+            })
+        
   }
   return (
     <Layout>
     <Box sx={{ background: "#EBEEF1",marginRight:"15px", padding: "15px 10px", borderRadius:"15px"}}>
       <DataGridSmartBev 
       columns={columns}
-      fetchUrl=""
+      fetchUrl="http://localhost:5000/dashboard/distributeurs"
       addFunction={addOne}
       editFunction={updateOne}
       {...propsInfo}
