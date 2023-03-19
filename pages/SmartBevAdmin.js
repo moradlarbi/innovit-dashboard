@@ -4,7 +4,7 @@ import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import {Box} from '@mui/material';
-import {Swal} from "sweetalert2"
+import Swal from 'sweetalert2'
 import DataGridSmartBev from '../src/components/DataGrids/DataGridSmartBev'
 const SmartBevAdmin = () => {
   const [refresh, setrefresh] = useState(false)
@@ -69,7 +69,7 @@ const SmartBevAdmin = () => {
       headerName: 'Pack',
       type: 'string',
       editable: false,
-      add: true,
+      add: false,
       edit: true,
     },
     {
@@ -77,7 +77,7 @@ const SmartBevAdmin = () => {
       headerName: 'Client',
       type: 'select',
       editable: false,
-      add: true,
+      add: false,
       edit: true,
     },
     {
@@ -118,7 +118,7 @@ const SmartBevAdmin = () => {
         Swal.fire({
           position: "center",
           icon: "success",
-          title: `${values.name} a bien été ajouté`,
+          title: `L'ajout a bien été effectué`,
           showConfirmButton: false,
           timer: 1500,
         });
@@ -127,7 +127,7 @@ const SmartBevAdmin = () => {
         Swal.fire({
           position: "top-end",
           icon: "error",
-          title: `${values.name} n'a pas été ajouté`,
+          title: `L'ajout n'a pas été effectué`,
           showConfirmButton: false,
           timer: 1500,
         });
@@ -156,7 +156,7 @@ const SmartBevAdmin = () => {
     })
     .then((result) => {
       if (result.isConfirmed) {
-        axios.delete(`http://localhost:3001/book/${id}`)
+        axios.delete(`http://localhost:5000/dashboard/distributeur/delete/${id}`)
           .then((res) => {
             if (res.status === 200) {
               Swal.fire({
@@ -181,7 +181,7 @@ const SmartBevAdmin = () => {
             Swal.fire({
               position: "top-end",
               icon: "error",
-              title: "L'item n'a pas été ajouté",
+              title: "L'item n'a pas été supprimé",
               showConfirmButton: false,
               timer: 1500,
             });
