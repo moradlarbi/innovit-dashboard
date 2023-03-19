@@ -4,8 +4,9 @@ import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import {Box} from '@mui/material';
-import {Swal} from "sweetalert2"
+import Swal from "sweetalert2"
 import DataGridSmartBev from '../src/components/DataGrids/DataGridSmartBev'
+import Layout from '../src/components/Layout'
 const SmartBevAdmin = () => {
   const [refresh, setrefresh] = useState(false)
   const [open, setOpen] = useState(false);
@@ -107,7 +108,8 @@ const SmartBevAdmin = () => {
       }
     }
   ];
-  const addOne = (values) => {
+  const addOne = (values,client) => {
+    console.log(client)
     axios.post('http://localhost:3001/book', values).then((res) => {
       if (res.status === 201) {
         Swal.fire({
@@ -211,7 +213,8 @@ const SmartBevAdmin = () => {
         })
   }
   return (
-    <Box sx={{ background: "#fff", padding: "15px 10px", borderRadius:"15px"}}>
+    <Layout>
+    <Box sx={{ background: "#EBEEF1",marginRight:"15px", padding: "15px 10px", borderRadius:"15px"}}>
       <DataGridSmartBev 
       columns={columns}
       fetchUrl=""
@@ -223,6 +226,7 @@ const SmartBevAdmin = () => {
       refreshParent={refresh}
        />
     </Box>
+    </Layout>
   )
 }
 
