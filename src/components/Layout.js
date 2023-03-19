@@ -39,7 +39,7 @@ export default function Layout({ children }) {
     return <Loading />;
   }
   return (
-    <div style={{ minHeight: "100vh",position:"relative" }}>
+    <div style={{ minHeight: "100vh",maxHeight:"100vh",overflow:"hidden",position:"relative" }}>
       
       <Box sx={{display:"flex", width:"100%", height:"100%",gap:"20px"}}>
         <Sidebar />

@@ -40,7 +40,7 @@ const SmartBevAdmin = () => {
       headerName: 'Identifiant',
       type: 'string',
       editable: false,
-      add: false,
+      add: true,
       edit: true,
     },
     {
@@ -73,7 +73,7 @@ const SmartBevAdmin = () => {
       type: 'string',
       editable: false,
       add: false,
-      edit: true,
+      edit: false,
     },
     {
       field: 'client',
@@ -111,14 +111,11 @@ const SmartBevAdmin = () => {
     }
   ];
 
-  const addOne = (values,client) => {
-    console.log(client)
-    axios.post('http://localhost:3001/book', values).then((res) => {
-      if (res.status === 201) {
-
+ 
   const addOne = (values) => {
     console.log(values);
     axios.post('http://localhost:5000/dashboard/distributeurs/add', {
+      identifiant: String(values.name),
       capaciteGoblet : parseInt(values.capaciteGoblet),
       capaciteSucre : parseInt(values.capaciteSucre),
       capaciteSpoon : parseInt(values.capaciteSpoon),
@@ -202,6 +199,7 @@ const SmartBevAdmin = () => {
   };
   const updateOne = (values,idClient) => {
     axios.put(`http://localhost:5000/dashboard/distributeur/edit/${values.id}`, {
+      identifiant: String(values.name),
       capaciteGoblet : parseInt(values.capaciteGoblet),
       capaciteSucre : parseInt(values.capaciteSucre),
       capaciteSpoon : parseInt(values.capaciteSpoon),
@@ -266,7 +264,7 @@ const SmartBevAdmin = () => {
   }
   return (
     <Layout>
-    <Box sx={{ background: "#EBEEF1",marginRight:"15px", padding: "15px 10px", borderRadius:"15px"}}>
+    <Box sx={{ background: "#fff",marginRight:"15px", padding: "15px 10px", borderRadius:"15px"}}>
       <DataGridSmartBev 
       columns={columns}
       fetchUrl="http://localhost:5000/dashboard/distributeurs"
