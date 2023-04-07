@@ -1,22 +1,31 @@
-import React, {useState } from 'react';
+import React, {useState, useEffect } from 'react';
 import {Box, Button, InputAdornment, TextField, Dialog, DialogActions, DialogContent,
-   DialogTitle, DialogContentText, Select, MenuItem} from '@mui/material';
+   DialogTitle, DialogContentText, Select, MenuItem, FormControl, InputLabel} from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from 'axios';
 import SearchIcon from '@mui/icons-material/Search';
-export default function DataGridSmartBev({
+export default function DataGridClients({
     fetchUrl,addFunction,editFunction,columns,info,refreshParent, add,edit,item,
     setItem,
     openUpdate,
     setOpenUpdate
 }) {
+    const [columnVisible, setColumnVisible] = useState();
+  useEffect(() => {
+    let newColumns ={}
+    columns.map((e) => {
+        newColumns[e.field] = e.hide ? !e.hide : true
+    })
+    setColumnVisible(newColumns);
+  }, [columns]);
     const [rows,setRows] = useState([])
     const [refresh, setRefresh] = useState(false)
     const [open, setOpen] = React.useState(false)
   const [states, setStates] = React.useState()
-  const [client, setClient] = useState()
   const [selectValues, setSelectValues] = useState([])
   const [recherche, setRecherche] = useState("")
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleClickShowPassword2 = () => setShowPassword2((show) => !show);
   const handleClickOpen = () => {
     setOpen(true)
   }
@@ -28,11 +37,7 @@ export default function DataGridSmartBev({
   const handleChange = (event) => {
     setStates({ ...states, [event.target.name]: event.target.value })
   }
-  const handleChangeSelect = (event) => {
-    setClient(event.target.value);
-    setRefresh(!refresh)
-
-  };
+  
   //Update dependacies
   
   const handleChangeUpdate = (event) => {
@@ -71,15 +76,15 @@ export default function DataGridSmartBev({
       //   console.log(e)
       // })
       setRows( [
-        { id: 1, name: 'Snow', client: 'Jon', goblet: 35, spoon: 12, sugar: 4, pack:"pack1" },
-        { id: 2, name: 'Lannister', client: 'Cersei', goblet: 42, spoon: 12, sugar: 4,pack:"pack1" },
-        { id: 3, name: 'Lannister', client: 'Jaime', goblet: 45, spoon: 12, sugar: 4,pack:"pack1" },
-        { id: 4, name: 'Stark', client: 'Arya', goblet: 16, spoon: 12, sugar: 4, pack:"pack1" },
-        { id: 5, name: 'Targaryen', client: 'Daenerys', goblet: 41, spoon: 12, sugar: 4, pack:"pack1" },
-        { id: 6, name: 'Melisandre', client: null, goblet: 15, spoon: 12, sugar: 40, pack:"pack1" },
-        { id: 7, name: 'Clifford', client: 'Ferrara', goblet: 44, spoon: 12, sugar: 4, pack:"pack1" },
-        { id: 8, name: 'Frances', client: 'Rossini', goblet: 36, spoon: 12, sugar: 4, pack:"pack1" },
-        { id: 9, name: 'Roxie', client: 'Harvey', goblet: 65, spoon: 12, sugar: 4 , pack:"pack1"},
+        { id: 1, first_name: 'Snow', last_name: 'Jon',  phone_number:"pack1" },
+        { id: 2, first_name: 'Lannister', last_name: 'Cersei',phone_number:"pack1" },
+        { id: 3, first_name: 'Lannister', last_name: 'Jaime', phone_number:"pack1" },
+        { id: 4, first_name: 'Stark', last_name: 'Arya',  phone_number:"pack1" },
+        { id: 5, first_name: 'Targaryen', last_name: 'Daenerys',  phone_number:"pack1" },
+        { id: 6, first_name: 'Melisandre', last_name: null,  phone_number:"pack1" },
+        { id: 7, first_name: 'Clifford', last_name: 'Ferrara',  phone_number:"pack1" },
+        { id: 8, first_name: 'Frances', last_name: 'Rossini',  phone_number:"pack1" },
+        { id: 9, first_name: 'Roxie', last_name: 'Harvey',  phone_number:"pack1"},
       ])
       setSelectValues([{id: 1,label:"Client1"},{id: 2,label:"Client2"},{id: 3,label:"Client3"},])
       }
@@ -131,42 +136,28 @@ export default function DataGridSmartBev({
               <DialogContentText>{info?.DialogDescription}</DialogContentText>
               <Box sx={{display: "grid", gridTemplateColumns:"1fr 1fr",gap:"10px 10px",margin:"10px 0"}}>
               {columns
-                ?.filter((e) => e.add && (e.type =="string" || e.type =="number" || e.type=="email"))
+                ?.filter((e) => e.add)
                 .map((column) => (
-                  <TextField
-                  key={column.id}
-                    id="outlined-start-adornment"
-                    name={column.field}
-                    type={column.type}
-                    label={column.headerName}
-                    onChange={handleChange}
-                    {...column.TextFieledProps}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">{''}</InputAdornment>
-                      ),
-                    }}
-                  />
-                ))}
-                {columns
-                ?.filter((e) => e.add && e.type=="select")
-                .map((column) => (
-                  <Select
-                  key={column.id}
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={client}
-                    label="Client"
-                    onChange={handleChangeSelect}
-                  >
-                    {selectValues.map((v) => {
-                        return (
-                            <MenuItem value={v.id}>{v.nom}</MenuItem>
-                        )
-                    })}
-                    
-                  </Select>
-                ))}
+                  <>
+                    {column.add && (column.type==="string" || column.type==="number"|| column.type=="email") &&
+        
+                        <TextField
+                        key={column.id}
+                            id="outlined-start-adornment"
+                            name={column.field}
+                            type={column.type}
+                            label={column.headerName}
+                            onChange={handleChange}
+                            {...column.TextFieledProps}
+                            InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">{''}</InputAdornment>
+                            ),
+                            }}
+                        />
+                        }
+                 </>
+              ))}
               </Box>
             </DialogContent>
             <DialogActions>
@@ -176,7 +167,7 @@ export default function DataGridSmartBev({
                   handleClose()
                 }}
               >
-                  Cancel
+                        Cancel
               </Button>
               <Button
                 variant="contained"
@@ -197,45 +188,34 @@ export default function DataGridSmartBev({
         <DialogContent>
           <DialogContentText>{info?.DialogUpdateDescription}</DialogContentText>
           <Box sx={{display: "grid", gridTemplateColumns:"1fr 1fr",gap:"10px 10px",margin:"10px 0"}}>
-          {columns?.map((column) => (
-            <>
-            {column.edit && (column.type==="string" || column.type==="number" ) && <TextField
-                key={column.id}
-                id="outlined-start-adornment"
-                type={column.type}
-                name={column.field}
-                value={item[column.field]}
-                label={column.headerName}
-                onChange={handleChangeUpdate}
-                {...column.TextFieledProps}
-                InputProps={{
-                  startAdornment: (
-                    <InputAdornment position="start">{''}</InputAdornment>
-                  ),
-                }}
-              /> }
-              
-            </>
-          ))}
           {columns
-                ?.filter((e) => e.edit && e.type=="select")
+                ?.filter((e) => e.edit)
                 .map((column) => (
-                  <Select
-                    key={column.id}
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={client}
-                    label="Client"
-                    onChange={handleChangeSelect}
-                  >
-                    {selectValues.map((v) => {
-                        return (
-                            <MenuItem value={v.id}>{v.nom}</MenuItem>
-                        )
-                    })}
-                    
-                  </Select>
-                ))}
+                  <>
+                    {column.edit && (column.type==="string" || column.type==="number"|| column.type=="email") &&
+        
+                        <TextField
+                        key={column.id}
+                            id="outlined-start-adornment"
+                            name={column.field}
+                            type={column.type}
+                            value={item[column.field]}
+                            label={column.headerName}
+                            onChange={handleChangeUpdate}
+                            {...column.TextFieledProps}
+                            InputProps={{
+                            startAdornment: (
+                                <InputAdornment position="start">{''}</InputAdornment>
+                            ),
+                            }}
+                        />
+                        }
+                        
+                        
+                 </>
+              ))}
+              
+          
           </Box>
           
         </DialogContent>
@@ -257,6 +237,7 @@ export default function DataGridSmartBev({
       <DataGrid
         rows={rows}
         columns={columns}
+        columnVisibilityModel={columnVisible}
         initialState={{
           pagination: {
             paginationModel: {
