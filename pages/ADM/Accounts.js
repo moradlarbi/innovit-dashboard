@@ -5,9 +5,10 @@ import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import {Box} from '@mui/material';
 import Swal from "sweetalert2"
-import DataGridAds from '../../src/components/DataGrids/DataGridAds'
+import DataGridAccounts from '../../src/components/DataGrids/DataGridAccounts'
 import Layout from '../../src/components/Layout'
-const Ads = () => {
+import PersonOffIcon from '@mui/icons-material/PersonOff';
+const Accounts = () => {
   const [refresh, setrefresh] = useState(false)
   const [open, setOpen] = useState(false);
   const [item, setItem] = useState({});
@@ -19,56 +20,99 @@ const Ads = () => {
     setItem: setItem,
   }
   const info = {
-    addText: 'Add an announcer',
+    title: "Agents' List",
+    description: "View and edit accounts of your agents",
+    addText: 'Add a new account',
     addIcon: <AddIcon />,
-    DialogTitle: 'Add a announcer',
-    DialogUpdate: "Edit a announcer",
-    DialogDescription: "The creation of a announcer profil",
-    DialogUpdateDescription: "Update of a announcer profil"
+    DialogTitle: 'Add an account',
+    DialogUpdate: "Edit an account",
+    DialogDescription: "The creation of an account profil",
+    DialogUpdateDescription: "Update of an account profil"
   }
   const propsInfo = {
     add: true,
     delete: true,
     edit: true
   }
+  const types = [{id: 2, name:"Deciders"},{id: 3,name:"Commercial Agent"},{id: 4,name:"maintenance Agent"}]
   const columns = [
-    { field: 'id', headerName: 'ID', width: 90, hide: true },
+    { field: 'id', headerName: 'ID', width: 90,visible: false, hide: true },
     {
-        field: 'annoncer',
-        headerName: 'Annoncer',
+      field: 'full_name',
+      headerName: 'Full name',
+      type: 'sa',
+      editable: false,
+      width: 150,
+      valueGetter: (params) => {
+        return `${params.row.nom} ${params.row.prenom}`
+      }
+    },
+    {
+      field: 'nom',
+      headerName: 'Last name',
+      type: 'string',
+      editable: false,
+      add: true,
+      edit: true,
+      hide: true,
+    },
+    {
+      field: 'prenom',
+      headerName: 'First name',
+      type: 'string',
+      editable: false,
+      add: true,
+      edit: true,
+      hide: true,
+    },
+    {
+        field: 'idRole',
+        headerName: 'Type',
         type: 'select',
         editable: false,
-        add: true,
-        edit: true,
+        add: false,
+        edit: false,
         width: 150,
+        valueGetter: (params) => {
+          switch (params.row.idRole){
+            case 5:
+              return "Decider"
+            case 3:
+              return "Agent maintenacier"
+            case 4:
+              return "Agent commercial"
+            default:
+              return ""
+          }
+           
+        }
       },
     {
-        field: 'category',
-        headerName: 'Category',
-        type: 'select',
-        editable: false,
-        add: true,
-        edit: true,
-        width: 150,
-      },
-    {
-      field: 'age',
-      headerName: 'age',
-      type: 'number',
+      field: 'mail',
+      headerName: 'Email',
+      type: 'email',
       editable: false,
       add: true,
       edit: true,
       width: 150,
     },
     {
-        field: 'url',
-        headerName: 'Video',
-        type: 'file',
+        field: 'tel',
+        headerName: 'Phone number',
+        type: 'string',
         editable: false,
         add: true,
         edit: true,
-        hide: true,
         width: 150,
+      },
+      {
+        field: 'mdp',
+        headerName: 'password',
+        type: 'password',
+        editable: false,
+        add: true,
+        edit: false,
+        hide: true
       },
     {
       field: "actions",
@@ -92,56 +136,57 @@ const Ads = () => {
       }}>
         { info.deleteIcon ? info.deleteIcon : <DeleteIcon />  }
       </div>
+
       </Box>)
           
       }
     }
   ];
-  const addOne = (values,client) => {
-    console.log(client)
-    axios.post('http://localhost:3001/book', values).then((res) => {
+  const addOne = (values) => {
+    console.log(values)
+    axios.post('http://localhost:5000/auth/signup',{...values, isActive: 1}).then((res) => {
       if (res.status === 201) {
         Swal.fire({
           position: "center",
           icon: "success",
-          title: `${values.name} a bien été ajouté`,
+          title: `${values.nom} a bien été ajouté`,
           showConfirmButton: false,
           timer: 1500,
         });
         setrefresh(!refresh)
-      } else if (res.status === 400) {
-        Swal.fire({
-          position: "top-end",
-          icon: "error",
-          title: `${values.name} n'a pas été ajouté`,
-          showConfirmButton: false,
-          timer: 1500,
-        });
-        console.log('bad req')
-      }
+      } 
       else {
         Swal.fire({
           position: "top-end",
           icon: "error",
-          title: `${values.name} n'a pas été ajouté`,
+          title: `${values.nom} n'a pas été ajouté`,
           showConfirmButton: false,
           timer: 1500,
         });
-      }
-        })
-    
-        console.log(values)
+      }}).catch((e) => {
+        console.log(e)
+        Swal.fire({
+          position: "top-end",
+          icon: "error",
+          title: `${values.nom} n'a pas été ajouté`,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      })
+
   }
   const deleteOne= (id) => {
     Swal.fire({
-      text: "Vous voulez vraiment supprimé l'item?",
+      text: "Vous voulez vraiment desactivé ce compte?",
       showCancelButton: true,
       confirmButtonText: 'Confirmer',
       cancelButtonText: `Annuler`,
     })
     .then((result) => {
       if (result.isConfirmed) {
-        axios.delete(`http://localhost:3001/book/${id}`)
+        axios.patch(`http://localhost:5000/users/status/${id}`, {
+          isActive: 0
+        })
           .then((res) => {
             if (res.status === 200) {
               Swal.fire({
@@ -166,7 +211,7 @@ const Ads = () => {
             Swal.fire({
               position: "top-end",
               icon: "error",
-              title: "L'item n'a pas été ajouté",
+              title: "L'item n'a pas été supprimé",
               showConfirmButton: false,
               timer: 1500,
             });
@@ -176,12 +221,12 @@ const Ads = () => {
     
   };
   const updateOne = (values) => {
-    axios.put(`http://localhost:3001/api/${values.id}`, values).then((res) => {
+    axios.patch(`http://localhost:5000/users/edit/${values.id}`, values).then((res) => {
           if (res.status === 200) {
             Swal.fire({
               position: "center",
               icon: "success",
-              title: `${values.name} a bien été mis a jour`,
+              title: `${values.nom} a bien été mis a jour`,
               showConfirmButton: false,
               timer: 1500,
             });
@@ -191,7 +236,7 @@ const Ads = () => {
             Swal.fire({
               position: "top-end",
               icon: "error",
-              title: `${values.name} n'a pas été mis a jour`,
+              title: `${values.nom} n'a pas été mis a jour`,
               showConfirmButton: false,
               timer: 1500,
             });
@@ -199,14 +244,23 @@ const Ads = () => {
               console.log('bad req')
             }
            } 
+        }).catch((e) => {
+          console.log(e)
+          Swal.fire({
+            position: "top-end",
+            icon: "error",
+            title: `${values.nom} n'a pas été mis a jour`,
+            showConfirmButton: false,
+            timer: 1500,
+          });
         })
   }
   return (
     <Layout>
-    <Box sx={{ background: "#EBEEF1",marginRight:"15px", padding: "15px 10px", borderRadius:"15px"}}>
-      <DataGridAds 
+    <Box sx={{ background: "#fff",marginRight:"15px", padding: "15px 10px", borderRadius:"15px"}}>
+      <DataGridAccounts 
       columns={columns}
-      fetchUrl=""
+      fetchUrl="http://localhost:5000/users"
       addFunction={addOne}
       editFunction={updateOne}
       {...propsInfo}
@@ -219,4 +273,4 @@ const Ads = () => {
   )
 }
 
-export default Ads
+export default Accounts

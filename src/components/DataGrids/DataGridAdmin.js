@@ -1,5 +1,5 @@
 import React, {useState, useEffect } from 'react';
-import {Box, Button, InputAdornment, TextField, Dialog, DialogActions, DialogContent,
+import {Box, Button, InputAdornment, TextField, Dialog, DialogActions, DialogContent,Typography,
    DialogTitle, DialogContentText, Select, MenuItem, IconButton, FormControl, InputLabel} from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import Visibility from '@mui/icons-material/Visibility';
@@ -42,11 +42,7 @@ export default function DataGridAdmin({
   const handleChange = (event) => {
     setStates({ ...states, [event.target.name]: event.target.value })
   }
-  const handleChangeSelect = (event) => {
-    setClient(event.target.value);
-    setRefresh(!refresh)
-
-  };
+  
   //Update dependacies
   
   const handleChangeUpdate = (event) => {
@@ -56,45 +52,32 @@ export default function DataGridAdmin({
     setOpenUpdate(false);
   };
     const getData = () => {
-      console.log(fetchUrl);
-     
-      // axios
-      // .get(
-      //   `${fetchUrl}`
-      // )
-      // .then((res) => {
-      //   if (res.status == 200) {
-      //     setRows(res.data)
-      //     console.log(res.data)
-      //   }
-      // })
-      // .catch((e) => {
-      //   console.log(e)
-      // })
-      // axios
-      // .get(
-      //   `http://localhost:5000/dashboard/users`
-      // )
-      // .then((res) => {
-      //   if (res.status == 200) {
-      //     console.log(res.data);
-      //     setSelectValues(res.data)
-      //   }
-      // })
-      // .catch((e) => {
-      //   console.log(e)
-      // })
-      setRows( [
-        { id: 1, first_name: 'Snow', last_name: 'Jon',  phone_number:"pack1" },
-        { id: 2, first_name: 'Lannister', last_name: 'Cersei',phone_number:"pack1" },
-        { id: 3, first_name: 'Lannister', last_name: 'Jaime', phone_number:"pack1" },
-        { id: 4, first_name: 'Stark', last_name: 'Arya',  phone_number:"pack1" },
-        { id: 5, first_name: 'Targaryen', last_name: 'Daenerys',  phone_number:"pack1" },
-        { id: 6, first_name: 'Melisandre', last_name: null,  phone_number:"pack1" },
-        { id: 7, first_name: 'Clifford', last_name: 'Ferrara',  phone_number:"pack1" },
-        { id: 8, first_name: 'Frances', last_name: 'Rossini',  phone_number:"pack1" },
-        { id: 9, first_name: 'Roxie', last_name: 'Harvey',  phone_number:"pack1"},
-      ])
+      axios
+      .get(
+        `${fetchUrl}`
+      )
+      .then((res) => {
+        if (res.status == 200) {
+          setRows(res.data)
+          console.log(res.data)
+        }
+      })
+      .catch((e) => {
+        console.log(e)
+      })
+      axios
+      .get(
+        `http://localhost:5000/entreprises`
+      )
+      .then((res) => {
+        if (res.status == 200) {
+          console.log(res.data)
+          setSelectValues(res.data)
+        }
+      })
+      .catch((e) => {
+        console.log(e)
+      })
       }
       React.useEffect(() => {
         getData()
@@ -103,7 +86,7 @@ export default function DataGridAdmin({
     <Box sx={{ height: 500, width: '100%', padding:"15px 10px", }}>
       {/* The Dialog Section */}
       {/* Dialog Button */}
-      {info?.title && <h1>{info?.title}</h1>}
+      {info?.title && <Typography variant='h4'>{info?.title}</Typography>}
       {info?.description && <p>{info?.description}</p>}
       {add && (
         <>
@@ -211,6 +194,23 @@ export default function DataGridAdmin({
 
                  </>
               ))}
+               <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label">client</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        name="idEntreprise"
+                        label="Client"
+                        onChange={handleChange}
+                    >
+                        {selectValues.map((v) => {
+                            return (
+                                <MenuItem value={v.id}>{v.nom}</MenuItem>
+                            )
+                        })}
+                        
+                    </Select>
+                </FormControl>
               
               </Box>
             </DialogContent>
@@ -291,17 +291,18 @@ export default function DataGridAdmin({
                  </>
               ))}
           <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">Choose a client</InputLabel>
+                    <InputLabel id="demo-simple-select-label">client</InputLabel>
                     <Select
                         labelId="demo-simple-select-label"
                         id="demo-simple-select"
-                        name="client"
+                        name="idEntreprise"
                         label="Client"
-                        onChange={handleChangeSelect}
+                        value={item.idEntreprise}
+                        onChange={handleChangeUpdate}
                     >
                         {selectValues.map((v) => {
                             return (
-                                <MenuItem value={v.id}>{v.label}</MenuItem>
+                                <MenuItem value={v.id}>{v.nom}</MenuItem>
                             )
                         })}
                         

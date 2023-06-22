@@ -7,6 +7,7 @@ const appProducer = (
 
   switch (action.type) {
     case "setUser": {
+      console.log(action.payload)
       return { ...state, user: action.payload };
     }
 
@@ -16,10 +17,7 @@ const appProducer = (
 };
 
 const defaultValues = {
-  user: {
-    first_name:"morad",
-    last_name:"larbi",
-  },
+  user:  (typeof window !== "undefined" && (window.localStorage.getItem('user') !== "undefined") )? JSON.parse(window.localStorage.getItem('user')): null,
 };
 
 const myState = {

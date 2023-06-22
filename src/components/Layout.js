@@ -4,12 +4,10 @@ import { useContext, useEffect, useState } from "react";
 import AppContext from "../../lib/AppContext";
 import { useRouter } from "next/router";
 import {Box} from '@mui/material';
-// import AppContext from "../lib/AppContext";
+
 import Loading from "./Loading";
 export default function Layout({ children }) {
-  const value = useContext(AppContext);
   const [loading, setloading] = useState(false);
-  let { setUser } = value;
   const route = useRouter();
   useEffect(() => {
     // setloading(true);
@@ -39,17 +37,18 @@ export default function Layout({ children }) {
     return <Loading />;
   }
   return (
+    
     <div style={{ minHeight: "100vh",maxHeight:"100vh",overflow:"hidden",position:"relative" }}>
       
-      <Box sx={{display:"flex", width:"100%", height:"100%",gap:"20px"}}>
+      <Box sx={{display:"flex", width:"100%", height:"100%"}}>
         <Sidebar />
-        <Box sx={{flex:"auto"}}>
+        <Box sx={{flex:"auto", overflowY:"auto"}}>
           <Header className=" flex-1" />
-          <main style={{flex:"auto"}}>{children}</main>
+          <main style={{flex:"auto", height:"100%"}}>{children}</main>
         </Box>
         
       </Box>
-
+      
     </div>
   );
 }

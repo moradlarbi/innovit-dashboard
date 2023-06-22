@@ -4,11 +4,12 @@ import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import {Box} from '@mui/material';
-import Swal from 'sweetalert2'
-import DataGridVendingAdmin from '../../src/components/DataGrids/DataGridVendingAdmin'
+import Swal from "sweetalert2"
+import DataGridDrinks from '../../src/components/DataGrids/DataGridDrinks'
 import Layout from '../../src/components/Layout'
-
-const SmartBevAdmin = () => {
+import { useCtxt } from '../../src/context/app.context'
+const Drinks = () => {
+  const {ctxt} = useCtxt()
   const [refresh, setrefresh] = useState(false)
   const [open, setOpen] = useState(false);
   const [item, setItem] = useState({});
@@ -20,14 +21,14 @@ const SmartBevAdmin = () => {
     setItem: setItem,
   }
   const info = {
-    title: "List of vending machines",
-    description: "View and edit your vending machines",
-    addText: 'Nouveau SmartBev',
+    addText: 'Add a drink',
     addIcon: <AddIcon />,
-    DialogTitle: 'Ajouter un SmartBev',
-    DialogUpdate: "Modifier un SmartBev",
-    DialogDescription: "La création d'un SmartBev et sa configuration",
-    DialogUpdateDescription: "La modification d'un SmartBev et sa configuration"
+    DialogTitle: 'Add a drink',
+    title: "List drinks",
+    description: "View and edit your drinks",
+    DialogUpdate: "Edit a drink",
+    DialogDescription: "The creation of a drink profil",
+    DialogUpdateDescription: "Update of a drink profil"
   }
   const propsInfo = {
     add: true,
@@ -37,68 +38,50 @@ const SmartBevAdmin = () => {
   const columns = [
     { field: 'id', headerName: 'ID', width: 90, hide: true },
     {
-      field: 'identifiant',
-      headerName: 'Identifiant',
+      field: 'name',
+      headerName: 'Drink',
       type: 'string',
       editable: false,
       add: true,
       edit: true,
-    },
-    {
-      field: 'capaciteGoblet',
-      headerName: 'Goblet',
-      type: 'number',
-      editable: false,
-      add: true,
-      edit: true,
-    },
-    {
-      field: 'capaciteSucre',
-      headerName: 'Sugar',
-      type: 'number',
-      editable: false,
-      add: true,
-      edit: true,
-    },
-    {
-      field: 'capaciteSpoon',
-      headerName: 'Spoon',
-      type: 'number',
-      editable: false,
-      add: true,
-      edit: true,
-    },
-    {
-      field: 'pack',
-      headerName: 'Pack',
-      type: 'string',
-      editable: false,
-      add: false,
-      edit: false,
+      width: 150,
       valueGetter: (params) => {
-        return `PACK ${params.row.id}`
+        return `${params.row?.recette.name}`
       }
     },
     {
-      field: "localisation",
-      headerName: "Région",
-      type:"string",
-      add: true,
-      edit: false,
-      valueGetter: (params) => {
-        return ` ${params.row.pack?.localisation}`
-      }
-    },
+        field: 'price',
+        headerName: 'Price',
+        type: 'number',
+        editable: false,
+        add: true,
+        edit: true,
+        width: 150,
+        valueGetter: (params) => {
+          return `${params.row.price} DZD`
+        }
+      },
     {
-      field: 'client',
-      headerName: 'Client',
-      type: 'select',
+        field: 'description',
+        headerName: 'Description',
+        type: 'string',
+        editable: false,
+        add: true,
+        edit: true,
+        width: 250,
+        valueGetter: (params) => {
+          return `${params.row.recette.description}`
+        }
+      },
+    {
+      field: 'image',
+      headerName: 'Image',
+      type: 'autre',
       editable: false,
-      add: false,
+      add: true,
       edit: true,
-      valueGetter: (params) => {
-        return `${params.row.entreprise?.nom}`
-      }
+      hide: true,
+      width: 150,
     },
     {
       field: "actions",
@@ -118,7 +101,7 @@ const SmartBevAdmin = () => {
         { info.editIcon ? info.editIcon : <EditIcon />  }
       </div>
       <div style={{"cursor":"pointer"}} onClick={() => {
-        deleteOne(params.row.id)
+        deleteOne(params.row.recette.id)
       }}>
         { info.deleteIcon ? info.deleteIcon : <DeleteIcon />  }
       </div>
@@ -127,28 +110,23 @@ const SmartBevAdmin = () => {
       }
     }
   ];
-
-
-  const addOne = (values) => {
-    console.log(values);
-    axios.post('http://localhost:5000/distributeurs/add', {
-      capaciteGoblet : parseInt(values.capaciteGoblet),
-      capaciteSucre : parseInt(values.capaciteSucre),
-      capaciteSpoon : parseInt(values.capaciteSpoon),
-      identifiant: values.identifiant,
-      pack : {
-        idEntre: values.client,
-        codeverou: "",
-        localisation: values.localisation,
-        state: 1
-      }
-    }).then((res) => {
-      if (res.status === 200) {
-
+  const addOne = (values,file) => {
+    console.log(values)
+    let formData = new FormData()
+    formData.append(
+      "image", file,
+    );
+    formData.append("idCategRecette",parseInt(values.category))
+    formData.append("name",values.name)
+    formData.append("description", values.description)
+    formData.append("price", values.price)
+    formData.append("idEntreprise", ctxt.user?.idEntreprise)
+    axios.post('http://localhost:5000/drinks/add', formData).then((res) => {
+      if (res.status === 201) {
         Swal.fire({
           position: "center",
           icon: "success",
-          title: `L'ajout a bien été effectué`,
+          title: `${values.name} a bien été ajouté`,
           showConfirmButton: false,
           timer: 1500,
         });
@@ -172,6 +150,8 @@ const SmartBevAdmin = () => {
             timer: 1500,
           });
         })
+    
+        console.log(values)
   }
   const deleteOne= (id) => {
     Swal.fire({
@@ -182,7 +162,7 @@ const SmartBevAdmin = () => {
     })
     .then((result) => {
       if (result.isConfirmed) {
-        axios.delete(`http://localhost:5000/distributeurs/delete/${id}`)
+        axios.delete(`http://localhost:5000/drinks/delete/${id}`)
           .then((res) => {
             if (res.status === 200) {
               Swal.fire({
@@ -207,7 +187,7 @@ const SmartBevAdmin = () => {
             Swal.fire({
               position: "top-end",
               icon: "error",
-              title: "L'item n'a pas été supprimé",
+              title: "L'item n'a pas été ajouté",
               showConfirmButton: false,
               timer: 1500,
             });
@@ -216,46 +196,47 @@ const SmartBevAdmin = () => {
     })
     
   };
-  const updateOne = (values,idClient) => {
+  const updateOne = (values) => {
     console.log(values)
-    console.log(idClient)
-    axios.patch(`http://localhost:5000/distributeurs/edit/${values.id}`, {
-      ...values, pack: {
-        ...values.pack, idEntre: idClient,localisation: values.localisation
-      }
-    }).then((res) => {
-          if (res.status === 200) {
+    axios.patch(`http://localhost:5000/drinks/edit/${values.id}`, values).then((res) => {
+          if (res.status === 201) {
             Swal.fire({
               position: "center",
               icon: "success",
-              title: `Les informations ont bien été mis a jour`,
+              title: `${values.recette?.name} a bien été mis a jour dans le distributeur `,
               showConfirmButton: false,
               timer: 1500,
             });
             setrefresh(!refresh)
           }
            else {
-            valide1 = false
+            Swal.fire({
+              position: "top-end",
+              icon: "error",
+              title: `${values.recette?.name} n'a pas été mis a jour`,
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            if (res.status === 400) {
+              console.log('bad req')
+            }
            } 
         }).catch((e) => {
           Swal.fire({
-            position: "center",
+            position: "top-end",
             icon: "error",
-            title: `Les informations n'ont pas été mis a jour`,
+            title: `${values.recette?.name} n'a pas été mis a jour`,
             showConfirmButton: false,
             timer: 1500,
           });
         })
-        
-        
   }
-
   return (
     <Layout>
     <Box sx={{ marginRight:"15px", padding: "15px 10px", borderRadius:"15px"}}>
-      <DataGridVendingAdmin 
+      <DataGridDrinks 
       columns={columns}
-      fetchUrl="http://localhost:5000/distributeurs"
+      fetchUrl={`http://localhost:5000/drinks/entreprises/${ctxt.user?.idEntreprise}`}
       addFunction={addOne}
       editFunction={updateOne}
       {...propsInfo}
@@ -268,4 +249,4 @@ const SmartBevAdmin = () => {
   )
 }
 
-export default SmartBevAdmin
+export default Drinks

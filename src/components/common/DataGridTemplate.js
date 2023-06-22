@@ -60,7 +60,7 @@ export default function DataGridTemplate({
     <Box sx={{ height: 800, width: '100%' }}>
       {/* The Dialog Section */}
       {/* Dialog Button */}
-      {info?.title && <h1>{info?.title}</h1>}
+      {info?.title && <Typography variant='h4'>{info?.title}</Typography>}
       {info?.description && <p>{info?.description}</p>}
       {add && (
         <>

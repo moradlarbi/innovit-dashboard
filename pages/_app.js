@@ -8,6 +8,7 @@ import theme from '../src/theme';
 import createEmotionCache from '../src/createEmotionCache';
 import "../styles/globals.css";
 import AppContext from "../lib/AppContext";
+import { AppProvider } from '../src/context/app.context';
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache();
 
@@ -43,7 +44,8 @@ export default function MyApp(props) {
   const getLayout = Component.getLayout || ((page) => page);
   const [user, setUser] = useState();
   return (
-    <CacheProvider value={emotionCache}>
+    <AppProvider>
+      <CacheProvider value={emotionCache}>
       <Head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
@@ -63,6 +65,7 @@ export default function MyApp(props) {
         </AppContext.Provider>
       </ThemeProvider>
     </CacheProvider>
+    </AppProvider>
   );
 }
 

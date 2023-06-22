@@ -1,10 +1,10 @@
-import React, {useState } from 'react';
-import {Box, Button, InputAdornment, TextField, Dialog, DialogActions, DialogContent,
-   DialogTitle, DialogContentText, Select, MenuItem} from '@mui/material';
+import React, {useEffect, useState } from 'react';
+import {Box, Button, InputAdornment, TextField, Dialog, DialogActions, DialogContent,Typography,
+   DialogTitle, DialogContentText, Select,FormControl, InputLabel, MenuItem} from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from 'axios';
 import SearchIcon from '@mui/icons-material/Search';
-export default function DataGridSmartBev({
+export default function DataGridVendingAdmin({
     fetchUrl,addFunction,editFunction,columns,info,refreshParent, add,edit,item,
     setItem,
     openUpdate,
@@ -36,7 +36,13 @@ export default function DataGridSmartBev({
   //Update dependacies
   
   const handleChangeUpdate = (event) => {
-    setItem({ ...item, [event.target.name]: event.target.value });
+    if (event.target.type === "number"){
+      setItem({ ...item, [event.target.name]: Number(event.target.value) });
+    }
+    else {
+      setItem({ ...item, [event.target.name]: event.target.value });
+    }
+    
   };
   const handleCloseUpdate = () => {
     setOpenUpdate(false);
@@ -44,53 +50,47 @@ export default function DataGridSmartBev({
     const getData = () => {
       console.log(fetchUrl);
      
-      // axios
-      // .get(
-      //   `${fetchUrl}`
-      // )
-      // .then((res) => {
-      //   if (res.status == 200) {
-      //     setRows(res.data)
-      //     console.log(res.data)
-      //   }
-      // })
-      // .catch((e) => {
-      //   console.log(e)
-      // })
-      // axios
-      // .get(
-      //   `http://localhost:5000/dashboard/users`
-      // )
-      // .then((res) => {
-      //   if (res.status == 200) {
-      //     console.log(res.data);
-      //     setSelectValues(res.data)
-      //   }
-      // })
-      // .catch((e) => {
-      //   console.log(e)
-      // })
-      setRows( [
-        { id: 1, name: 'Snow', client: 'Jon', goblet: 35, spoon: 12, sugar: 4, pack:"pack1" },
-        { id: 2, name: 'Lannister', client: 'Cersei', goblet: 42, spoon: 12, sugar: 4,pack:"pack1" },
-        { id: 3, name: 'Lannister', client: 'Jaime', goblet: 45, spoon: 12, sugar: 4,pack:"pack1" },
-        { id: 4, name: 'Stark', client: 'Arya', goblet: 16, spoon: 12, sugar: 4, pack:"pack1" },
-        { id: 5, name: 'Targaryen', client: 'Daenerys', goblet: 41, spoon: 12, sugar: 4, pack:"pack1" },
-        { id: 6, name: 'Melisandre', client: null, goblet: 15, spoon: 12, sugar: 40, pack:"pack1" },
-        { id: 7, name: 'Clifford', client: 'Ferrara', goblet: 44, spoon: 12, sugar: 4, pack:"pack1" },
-        { id: 8, name: 'Frances', client: 'Rossini', goblet: 36, spoon: 12, sugar: 4, pack:"pack1" },
-        { id: 9, name: 'Roxie', client: 'Harvey', goblet: 65, spoon: 12, sugar: 4 , pack:"pack1"},
-      ])
-      setSelectValues([{id: 1,label:"Client1"},{id: 2,label:"Client2"},{id: 3,label:"Client3"},])
+      axios
+      .get(
+        `${fetchUrl}`
+      )
+      .then((res) => {
+        if (res.status == 200) {
+          setRows(res.data)
+          console.log(res.data)
+        }
+      })
+      .catch((e) => {
+        console.log(e)
+      })
+      axios
+      .get(
+        `http://localhost:5000/dashboard/clients`
+      )
+      .then((res) => {
+        if (res.status == 200) {
+          console.log(res.data);
+          setSelectValues(res.data)
+        }
+      })
+      .catch((e) => {
+        console.log(e)
+      })
       }
       React.useEffect(() => {
         getData()
       }, [ refreshParent, refresh])
+      useEffect(() => {
+        if (Object.keys(item).length > 0) {
+          console.log(item.entreprise)
+          setClient(item.entreprise?.id)
+        }
+      }, [item])
   return (
     <Box sx={{ height: 500, width: '100%', padding:"15px 10px", }}>
       {/* The Dialog Section */}
       {/* Dialog Button */}
-      {info?.title && <h1>{info?.title}</h1>}
+      {info?.title && <Typography variant='h4'>{info?.title}</Typography>}
       {info?.description && <p>{info?.description}</p>}
       {add && (
         <>
@@ -131,13 +131,13 @@ export default function DataGridSmartBev({
               <DialogContentText>{info?.DialogDescription}</DialogContentText>
               <Box sx={{display: "grid", gridTemplateColumns:"1fr 1fr",gap:"10px 10px",margin:"10px 0"}}>
               {columns
-                ?.filter((e) => e.add && (e.type =="string" || e.type =="number" || e.type=="email"))
+                ?.filter((e) => e.add && (e.type =="string" || e.type =="number"))
                 .map((column) => (
                   <TextField
-                  key={column.id}
+                  key={column.field}
+                  type={column.type}
                     id="outlined-start-adornment"
                     name={column.field}
-                    type={column.type}
                     label={column.headerName}
                     onChange={handleChange}
                     {...column.TextFieledProps}
@@ -148,25 +148,23 @@ export default function DataGridSmartBev({
                     }}
                   />
                 ))}
-                {columns
-                ?.filter((e) => e.add && e.type=="select")
-                .map((column) => (
-                  <Select
-                  key={column.id}
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={client}
-                    label="Client"
-                    onChange={handleChangeSelect}
-                  >
-                    {selectValues.map((v) => {
-                        return (
-                            <MenuItem value={v.id}>{v.nom}</MenuItem>
-                        )
-                    })}
-                    
-                  </Select>
-                ))}
+                <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label">Client</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        name="client"
+                        label="client"
+                        onChange={handleChange}
+                    >
+                        {selectValues.map((v) => {
+                            return (
+                                <MenuItem key={v.id} value={v.id}>{v.nom}</MenuItem>
+                            )
+                        })}
+                        
+                    </Select>
+                </FormControl>
               </Box>
             </DialogContent>
             <DialogActions>
@@ -176,7 +174,7 @@ export default function DataGridSmartBev({
                   handleClose()
                 }}
               >
-                  Cancel
+                  Annuler
               </Button>
               <Button
                 variant="contained"
@@ -187,7 +185,7 @@ export default function DataGridSmartBev({
 
                 }}
               >
-                Create
+                Enregistrer
               </Button>
             </DialogActions>
           </Dialog>
@@ -200,7 +198,7 @@ export default function DataGridSmartBev({
           {columns?.map((column) => (
             <>
             {column.edit && (column.type==="string" || column.type==="number" ) && <TextField
-                key={column.id}
+                key={column.field}
                 id="outlined-start-adornment"
                 type={column.type}
                 name={column.field}
@@ -215,27 +213,41 @@ export default function DataGridSmartBev({
                 }}
               /> }
               
+              
             </>
           ))}
-          {columns
-                ?.filter((e) => e.edit && e.type=="select")
-                .map((column) => (
-                  <Select
-                    key={column.id}
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={client}
-                    label="Client"
-                    onChange={handleChangeSelect}
-                  >
-                    {selectValues.map((v) => {
-                        return (
-                            <MenuItem value={v.id}>{v.nom}</MenuItem>
-                        )
-                    })}
-                    
-                  </Select>
-                ))}
+          <TextField
+                id="outlined-start-adornment"
+                type="string"
+                defaultValue={item.pack?.localisation}
+                name="localisation"
+                value={item.localisation}
+                label="localisation"
+                onChange={handleChangeUpdate}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">{''}</InputAdornment>
+                  ),
+                }}
+              />
+          <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label">Client</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        name="client"
+                        label="client"
+                        value={client}
+                        onChange={handleChangeSelect}
+                    >
+                        {selectValues.map((v) => {
+                            return (
+                                <MenuItem key={v.id} value={v.id}>{v.nom}</MenuItem>
+                            )
+                        })}
+                        
+                    </Select>
+                </FormControl>
           </Box>
           
         </DialogContent>
@@ -248,7 +260,7 @@ export default function DataGridSmartBev({
               handleCloseUpdate()
             }
             handleCloseUpdate()
-          }}>Save changes</Button>
+          }}>Mettre a jour</Button>
         </DialogActions>
       </Dialog>}
         </>

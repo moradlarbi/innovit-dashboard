@@ -1,18 +1,21 @@
 import React, {useState, useEffect } from 'react';
 import {Box, Button, InputAdornment, TextField, Dialog, DialogActions, DialogContent,
-   DialogTitle, DialogContentText, Select, MenuItem, IconButton, FormControl, InputLabel} from '@mui/material';
+   DialogTitle, DialogContentText, Select, MenuItem, IconButton, FormControl, InputLabel, Typography} from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import axios from 'axios';
 import SearchIcon from '@mui/icons-material/Search';
+import { useCtxt } from '../../context/app.context';
 export default function DataGridAccounts({
     fetchUrl,addFunction,editFunction,columns,info,refreshParent, add,edit,item,
     setItem,
     openUpdate,
     setOpenUpdate
 }) {
+  const {ctxt} = useCtxt()
     const [columnVisible, setColumnVisible] = useState();
+    const [actifRole, setActifRole] = useState(5)
   useEffect(() => {
     let newColumns ={}
     columns.map((e) => {
@@ -25,7 +28,6 @@ export default function DataGridAccounts({
     const [open, setOpen] = React.useState(false)
   const [states, setStates] = React.useState()
   const [client, setClient] = useState()
-  const [type, setType] = useState("")
   const [selectValues, setSelectValues] = useState([])
   const [recherche, setRecherche] = useState("")
   const [showPassword, setShowPassword] = React.useState(false);
@@ -44,10 +46,9 @@ export default function DataGridAccounts({
     setStates({ ...states, [event.target.name]: event.target.value })
   }
   const handleChangeSelect = (event) => {
-    setClient(event.target.value);
-    setRefresh(!refresh)
-
-  };
+    setClient(event.target.value)
+  }
+ 
   //Update dependacies
   
   const handleChangeUpdate = (event) => {
@@ -59,53 +60,51 @@ export default function DataGridAccounts({
     const getData = () => {
       console.log(fetchUrl);
      
-      // axios
-      // .get(
-      //   `${fetchUrl}`
-      // )
-      // .then((res) => {
-      //   if (res.status == 200) {
-      //     setRows(res.data)
-      //     console.log(res.data)
-      //   }
-      // })
-      // .catch((e) => {
-      //   console.log(e)
-      // })
-      // axios
-      // .get(
-      //   `http://localhost:5000/dashboard/users`
-      // )
-      // .then((res) => {
-      //   if (res.status == 200) {
-      //     console.log(res.data);
-      //     setSelectValues(res.data)
-      //   }
-      // })
-      // .catch((e) => {
-      //   console.log(e)
-      // })
-      setRows( [
-        { id: 1, first_name: 'Snow', last_name: 'Jon',  phone_number:"pack1", type:1 },
-        { id: 2, first_name: 'Lannister', last_name: 'Cersei',phone_number:"pack1" },
-        { id: 3, first_name: 'Lannister', last_name: 'Jaime', phone_number:"pack1" },
-        { id: 4, first_name: 'Stark', last_name: 'Arya',  phone_number:"pack1" },
-        { id: 5, first_name: 'Targaryen', last_name: 'Daenerys',  phone_number:"pack1" },
-        { id: 6, first_name: 'Melisandre', last_name: null,  phone_number:"pack1" },
-        { id: 7, first_name: 'Clifford', last_name: 'Ferrara',  phone_number:"pack1" },
-        { id: 8, first_name: 'Frances', last_name: 'Rossini',  phone_number:"pack1" },
-        { id: 9, first_name: 'Roxie', last_name: 'Harvey',  phone_number:"pack1"},
-      ])
+      axios
+      .get(
+        `${fetchUrl}/role/${actifRole}`
+      )
+      .then((res) => {
+        if (res.status == 200) {
+          setRows(res.data)
+          console.log(res.data)
+        }
+      })
+      .catch((e) => {
+        console.log(e)
+      })
       }
       React.useEffect(() => {
         getData()
       }, [ refreshParent, refresh])
-      const types = [{id: 1, name:"Deciders"},{id: 2,name:"Commercial Agent"},{id: 3,name:"maintenance Agent"}]
+      React.useEffect(() => {
+       if (Object.keys(item).length > 0){
+        axios
+      .get(
+        `http://localhost:5000/entreprises`
+      )
+      .then((res) => {
+        if (res.status == 200) {
+          setSelectValues(res.data)
+          setRefresh(!refresh)
+          console.log(res.data)
+        }
+      })
+      .catch((e) => {
+        console.log(e)
+      })
+       }
+        
+      }, [item])
+      React.useEffect(() => {
+
+      }, [refresh])
+      const types = [{id: 5, name:"Deciders"},{id: 4,name:"Commercial Agent"},{id: 3,name:"maintenance Agent"}]
   return (
     <Box sx={{ height: 500, width: '100%', padding:"15px 10px", }}>
       {/* The Dialog Section */}
       {/* Dialog Button */}
-      {info?.title && <h1>{info?.title}</h1>}
+      {info?.title && <Typography variant='h4'>{info?.title}</Typography>}
       {info?.description && <p>{info?.description}</p>}
       {add && (
         <>
@@ -113,7 +112,10 @@ export default function DataGridAccounts({
         <Box sx={{ display:"flex", gap:"10px"}}>
             {types.map((t) => {
                 return (
-                    <Box key={t.id} sx={{ background: t.id === type ? "#9BAEBC": "#EBEEF1", color:t.id === type ? "#fff": "#000", borderRadius:"15px", padding:"8px 30px", cursor:"pointer" }}>
+                    <Box key={t.id} sx={{ background: t.id === actifRole ? "#11B07A": "#EBEEF1", color:t.id === actifRole ? "#fff": "#000", borderRadius:"15px", padding:"8px 30px", cursor:"pointer" }} onClick={() => {
+                      setActifRole(t.id)
+                      setRefresh(!refresh)
+                    }}>
                         {t.name}
                     </Box>
                 )
@@ -130,18 +132,39 @@ export default function DataGridAccounts({
           
 
           <Dialog open={open} onClose={handleClose}>
+            <Box sx={{ display:"flex", width:"100%", justifyContent:"space-between", padding:"20px 30px"}}>
             <DialogTitle>{info?.DialogTitle}</DialogTitle>
+            <FormControl sx={{ minWidth:"250px"}}>
+                    <InputLabel id="demo-simple-select-label">Type</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        name="idRole"
+                        label="type"
+                        onChange={handleChange}
+                    >
+                        {types.map((v) => {
+                            return (
+                                <MenuItem key={v.id} value={v.id}>{v.name}</MenuItem>
+                            )
+                        })}
+                        
+                    </Select>
+                </FormControl>
+            </Box>
+            
 
             <DialogContent>
-              <DialogContentText>{info?.DialogDescription}</DialogContentText>
+              
               <Box sx={{display: "grid", gridTemplateColumns:"1fr 1fr",gap:"10px 10px",margin:"10px 0"}}>
+              
               {columns
                 ?.filter((e) => e.add)
                 .map((column) => (
-                  <>
+                  <Box key={column.id}>
                     {column.add && (column.type==="string" || column.type==="number"|| column.type=="email") &&
-        
                         <TextField
+                        fullWidth
                         key={column.id}
                             id="outlined-start-adornment"
                             name={column.field}
@@ -178,13 +201,16 @@ export default function DataGridAccounts({
                         ),
                         }}
                     />
-                    <TextField
-                        id={column.field}
+                    
+                        </> }
+                        
+                 </Box>
+              ))}
+              <TextField
                         type={showPassword2 ? 'text':'password'}
                         name="confirm"
                         label="Confirm password"
                         onChange={handleChange}
-                        {...column.TextFieledProps}
                         InputProps={{
                         endAdornment: (
                             <InputAdornment position="start">
@@ -199,26 +225,7 @@ export default function DataGridAccounts({
                         ),
                         }}
                     />
-                        </> }
-                 </>
-              ))}
-              <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">Type</InputLabel>
-                    <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        name="type"
-                        label="type"
-                        onChange={handleChange}
-                    >
-                        {types.map((v) => {
-                            return (
-                                <MenuItem value={v.id}>{v.name}</MenuItem>
-                            )
-                        })}
-                        
-                    </Select>
-                </FormControl>
+              
               </Box>
             </DialogContent>
             <DialogActions>
@@ -233,8 +240,7 @@ export default function DataGridAccounts({
               <Button
                 variant="contained"
                 onClick={() => {
-
-                  if (addFunction) addFunction(states)
+                  if (addFunction) addFunction({...states,  idEntreprise: ctxt?.user.idEntreprise})
                   handleClose()
 
                 }}
@@ -245,9 +251,11 @@ export default function DataGridAccounts({
           </Dialog>
           {/* Update dialog */}
           {edit && <Dialog open={openUpdate || false} onClose={handleCloseUpdate} >
-        <DialogTitle>{info?.DialogUpdate}</DialogTitle>
+          <Box sx={{ display:"flex", width:"100%", justifyContent:"space-between", padding:"20px 30px"}}>
+            <DialogTitle>{info?.DialogUpdate}</DialogTitle>
+          </Box>
+          
         <DialogContent>
-          <DialogContentText>{info?.DialogUpdateDescription}</DialogContentText>
           <Box sx={{display: "grid", gridTemplateColumns:"1fr 1fr",gap:"10px 10px",margin:"10px 0"}}>
           {columns
                 ?.filter((e) => e.edit)
@@ -297,23 +305,7 @@ export default function DataGridAccounts({
                         </> }
                  </>
               ))}
-              <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">Type</InputLabel>
-                    <Select
-                        labelId="demo-simple-select-label"
-                        id="demo-simple-select"
-                        name="type"
-                        label="type"
-                        onChange={handleChangeUpdate}
-                    >
-                        {types.map((v) => {
-                            return (
-                                <MenuItem value={v.id}>{v.name}</MenuItem>
-                            )
-                        })}
-                        
-                    </Select>
-                </FormControl>
+              
           
           </Box>
           
@@ -322,8 +314,7 @@ export default function DataGridAccounts({
           <Button onClick={handleCloseUpdate}>Annuler</Button>
           <Button onClick={() => {
             if (editFunction){
-              console.log("-----",client);
-              editFunction(item,client)
+              editFunction({...item,idRole:client})
               handleCloseUpdate()
             }
             handleCloseUpdate()

@@ -1,13 +1,14 @@
 import {useState} from 'react'
 import axios from 'axios'
 import AddIcon from '@mui/icons-material/Add'
-import EditIcon from '@mui/icons-material/Edit'
-import DeleteIcon from '@mui/icons-material/Delete'
 import {Box} from '@mui/material';
 import Swal from "sweetalert2"
-import DataGridAccounts from '../../src/components/DataGrids/DataGridAccounts'
 import Layout from '../../src/components/Layout'
-const Accounts = () => {
+import DataGridMaintenanceAgents from '../../src/components/DataGrids/DataGridMaintenaceAgents'
+import { useRouter } from 'next/router'
+import { Visibility } from '@mui/icons-material'
+const MaintenanceAgents = () => {
+  const router = useRouter()
   const [refresh, setrefresh] = useState(false)
   const [open, setOpen] = useState(false);
   const [item, setItem] = useState({});
@@ -36,14 +37,15 @@ const Accounts = () => {
     {
       field: 'full_name',
       headerName: 'Full name',
-      type: 'string',
+      type: 'sa',
       editable: false,
+      width: 150,
       valueGetter: (params) => {
-        return `${params.row.last_name} ${params.row.first_name}`
+        return `${params.row.nom} ${params.row.prenom}`
       }
     },
     {
-      field: 'last_name',
+      field: 'nom',
       headerName: 'Last name',
       type: 'string',
       editable: false,
@@ -52,7 +54,7 @@ const Accounts = () => {
       hide: true,
     },
     {
-      field: 'first_name',
+      field: 'prenom',
       headerName: 'First name',
       type: 'string',
       editable: false,
@@ -61,68 +63,46 @@ const Accounts = () => {
       hide: true,
     },
     {
-        field: 'type',
-        headerName: 'Type',
-        type: 'select',
-        editable: false,
-        add: true,
-        edit: true,
-      },
-    {
-      field: 'email',
+      field: 'mail',
       headerName: 'Email',
       type: 'email',
       editable: false,
       add: true,
       edit: true,
+      width: 150,
     },
     {
-        field: 'phone_number',
+        field: 'tel',
         headerName: 'Phone number',
         type: 'string',
         editable: false,
         add: true,
         edit: true,
+        width: 150,
       },
       {
-        field: 'password',
-        headerName: 'password',
-        type: 'password',
+        field: "actions",
+        headerName: "",
+        type: 'string',
+        sortable: false,
+        filterable: false,
         editable: false,
-        add: true,
-        edit: false,
-        hide: true
-      },
-    {
-      field: "actions",
-      headerName: "Actions",
-      type: 'string',
-      sortable: false,
-      filterable: false,
-      editable: false,
-      hide: !propsInfo.edit,
-      width: 100,
-      renderCell: (params) => {
-        return (<Box sx={{ display: "flex", gap:"10px", alignItems:"center"}}>
-        <div style={{"cursor":"pointer"}} onClick={() => {
-        setItem(params.row)
-        setOpen(true);
-      }}>
-        { info.editIcon ? info.editIcon : <EditIcon />  }
-      </div>
-      <div style={{"cursor":"pointer"}} onClick={() => {
-        deleteOne(params.row.id)
-      }}>
-        { info.deleteIcon ? info.deleteIcon : <DeleteIcon />  }
-      </div>
-      </Box>)
-          
+        hide: !propsInfo.edit,
+        width: 100,
+        renderCell: (params) => {
+          return (<Box sx={{ display: "flex", gap:"10px", alignItems:"center"}}>
+          <div style={{"cursor":"pointer"}} onClick={() => {
+          router.push(`/ADM/MaintenanceAgent/${params.row.id}`)
+        }}>
+          <Visibility />
+        </div>
+        </Box>)
+            
+        }
       }
-    }
   ];
-  const addOne = (values,client) => {
-    console.log(client)
-    axios.post('http://localhost:3001/book', values).then((res) => {
+  const addOne = (values) => {
+    axios.post('http://localhost:5000/dashboard/accounts', values).then((res) => {
       if (res.status === 201) {
         Swal.fire({
           position: "center",
@@ -164,7 +144,7 @@ const Accounts = () => {
     })
     .then((result) => {
       if (result.isConfirmed) {
-        axios.delete(`http://localhost:3001/book/${id}`)
+        axios.delete(`http://localhost:5000/dashboard/users/delete/${id}`)
           .then((res) => {
             if (res.status === 200) {
               Swal.fire({
@@ -199,12 +179,12 @@ const Accounts = () => {
     
   };
   const updateOne = (values) => {
-    axios.put(`http://localhost:3001/api/${values.id}`, values).then((res) => {
+    axios.put(`http://localhost:5000/dashboard/account/edit/${values.id}`, values).then((res) => {
           if (res.status === 200) {
             Swal.fire({
               position: "center",
               icon: "success",
-              title: `${values.name} a bien été mis a jour`,
+              title: `${values.nom} a bien été mis a jour`,
               showConfirmButton: false,
               timer: 1500,
             });
@@ -214,7 +194,7 @@ const Accounts = () => {
             Swal.fire({
               position: "top-end",
               icon: "error",
-              title: `${values.name} n'a pas été mis a jour`,
+              title: `${values.nom} n'a pas été mis a jour`,
               showConfirmButton: false,
               timer: 1500,
             });
@@ -226,10 +206,10 @@ const Accounts = () => {
   }
   return (
     <Layout>
-    <Box sx={{ background: "#EBEEF1",marginRight:"15px", padding: "15px 10px", borderRadius:"15px"}}>
-      <DataGridAccounts 
+    <Box sx={{ background: "#fff",marginRight:"15px", padding: "15px 10px", borderRadius:"15px"}}>
+      <DataGridMaintenanceAgents 
       columns={columns}
-      fetchUrl=""
+      fetchUrl="http://localhost:5000/users/role/4"
       addFunction={addOne}
       editFunction={updateOne}
       {...propsInfo}
@@ -242,4 +222,4 @@ const Accounts = () => {
   )
 }
 
-export default Accounts
+export default MaintenanceAgents

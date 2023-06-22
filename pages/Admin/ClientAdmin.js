@@ -28,43 +28,47 @@ const ClientAdmin = () => {
   }
   const propsInfo = {
     add: true,
-    delete: true,
+    delete: false,
     edit: true
   }
   const columns = [
     { field: 'id', headerName: 'ID', width: 90, hide: true },
     {
-      field: 'name',
+      field: 'nom',
       headerName: 'Name',
       type: 'string',
       editable: false,
       add: true,
       edit: true,
+      width: 150,
     },
     {
-      field: 'location',
+      field: 'adresse',
       headerName: 'Location',
       type: 'string',
       editable: false,
       add: true,
       edit: true,
       hide: true,
+      width: 150,
     },
     {
-      field: 'email',
+      field: 'mail',
       headerName: 'Email',
       type: 'email',
       editable: false,
       add: true,
       edit: true,
+      width: 150,
     },
     {
-        field: 'phone_number',
+        field: 'tel',
         headerName: 'Phone number',
         type: 'string',
         editable: false,
         add: true,
         edit: true,
+        width: 150,
       },
     {
       field: "actions",
@@ -93,28 +97,19 @@ const ClientAdmin = () => {
       }
     }
   ];
-  const addOne = (values,client) => {
-    console.log(client)
-    axios.post('http://localhost:3001/book', values).then((res) => {
+  const addOne = (values) => {
+    console.log(values)
+    axios.post('http://localhost:5000/entreprises/add', {...values, link: ""}).then((res) => {
       if (res.status === 201) {
         Swal.fire({
           position: "center",
           icon: "success",
-          title: `${values.name} a bien été ajouté`,
+          title: `${values.nom} a bien été ajouté`,
           showConfirmButton: false,
           timer: 1500,
         });
         setrefresh(!refresh)
-      } else if (res.status === 400) {
-        Swal.fire({
-          position: "top-end",
-          icon: "error",
-          title: `${values.name} n'a pas été ajouté`,
-          showConfirmButton: false,
-          timer: 1500,
-        });
-        console.log('bad req')
-      }
+      } 
       else {
         Swal.fire({
           position: "top-end",
@@ -124,6 +119,15 @@ const ClientAdmin = () => {
           timer: 1500,
         });
       }
+        }).catch((e) => {
+          console.log(e)
+          Swal.fire({
+            position: "top-end",
+            icon: "error",
+            title: `${values.name} n'a pas été ajouté`,
+            showConfirmButton: false,
+            timer: 1500,
+          });
         })
     
         console.log(values)
@@ -137,7 +141,7 @@ const ClientAdmin = () => {
     })
     .then((result) => {
       if (result.isConfirmed) {
-        axios.delete(`http://localhost:3001/book/${id}`)
+        axios.delete(`http://localhost:5000/entreprises/delete/${id}`)
           .then((res) => {
             if (res.status === 200) {
               Swal.fire({
@@ -172,12 +176,13 @@ const ClientAdmin = () => {
     
   };
   const updateOne = (values) => {
-    axios.put(`http://localhost:3001/api/${values.id}`, values).then((res) => {
+    console.log(values)
+    axios.patch(`http://localhost:5000/entreprises/edit/${values.id}`, values).then((res) => {
           if (res.status === 200) {
             Swal.fire({
               position: "center",
               icon: "success",
-              title: `${values.name} a bien été mis a jour`,
+              title: `${values.nom} a bien été mis a jour`,
               showConfirmButton: false,
               timer: 1500,
             });
@@ -187,7 +192,7 @@ const ClientAdmin = () => {
             Swal.fire({
               position: "top-end",
               icon: "error",
-              title: `${values.name} n'a pas été mis a jour`,
+              title: `${values.nom} n'a pas été mis a jour`,
               showConfirmButton: false,
               timer: 1500,
             });
@@ -195,14 +200,23 @@ const ClientAdmin = () => {
               console.log('bad req')
             }
            } 
+        }).catch((e) => {
+          console.log(e)
+          Swal.fire({
+            position: "top-end",
+            icon: "error",
+            title: `${values.nom} n'a pas été mis a jour`,
+            showConfirmButton: false,
+            timer: 1500,
+          });
         })
   }
   return (
     <Layout>
-    <Box sx={{ background: "#EBEEF1",marginRight:"15px", padding: "15px 10px", borderRadius:"15px"}}>
+    <Box sx={{ marginRight:"15px", padding: "15px 10px", borderRadius:"15px"}}>
       <DataGridClients 
       columns={columns}
-      fetchUrl=""
+      fetchUrl="http://localhost:5000/entreprises"
       addFunction={addOne}
       editFunction={updateOne}
       {...propsInfo}

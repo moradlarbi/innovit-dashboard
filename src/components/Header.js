@@ -7,7 +7,6 @@ const Header = () => {
   return (
     <Box sx={{display:"flex", justifyContent:"flex-end", width:"100%",alignItems:"center",padding:"20px 30px",gap:"10px"}}>
       <Box style={{position: "relative", cursor:"pointer"}} onClick={() => {
-      navigate("/panier")
     }}>
         <NotificationsNoneIcon style={{ color: '#acacac', fontSize: 30 }} />
     </Box>
@@ -17,13 +16,13 @@ const Header = () => {
         alignItems="center"
         justifyContent="center"
       >
-        {user? (
+        {/* {user? (
           <Box sx={{ backgroundColor: "#EFEFEF", padding: "12px", borderRadius: "10px", cursor: "pointer"}} color="#000" onClick={() => {
             
           }}>
-            <Typography style={{ textTransform: "uppercase"}} >{user?.first_name.substring(0,2)}</Typography>
+            <Typography style={{ textTransform: "uppercase"}} >{user?.nom?.substring(0,2)}</Typography>
         </Box>
-        ) : null}
+        ) : null} */}
       </Stack>
     </Box>
     

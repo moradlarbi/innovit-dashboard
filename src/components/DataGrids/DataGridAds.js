@@ -1,6 +1,6 @@
 import React, {useState, useEffect } from 'react';
 import {Box, Button, InputAdornment, TextField, Dialog, DialogActions, DialogContent,
-   DialogTitle, DialogContentText, Select, MenuItem, FormControl, InputLabel} from '@mui/material';
+   DialogTitle, DialogContentText, Select, MenuItem, FormControl, InputLabel, Typography} from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from 'axios';
 import SearchIcon from '@mui/icons-material/Search';
@@ -24,8 +24,6 @@ export default function DataGridAds({
   const [states, setStates] = React.useState()
   const [selectValues, setSelectValues] = useState([])
   const [recherche, setRecherche] = useState("")
-  const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const handleClickShowPassword2 = () => setShowPassword2((show) => !show);
   const handleClickOpen = () => {
     setOpen(true)
   }
@@ -46,56 +44,75 @@ export default function DataGridAds({
   const handleCloseUpdate = () => {
     setOpenUpdate(false);
   };
+  const [category, setCategory] = useState()
+  const [categories, setCategories] = useState([])
+  const [categoriesDrinks, setCategoriesDrinks] = useState([])
+  const [annoncer, setAnnoncer] = useState()
+ 
+ 
     const getData = () => {
-      console.log(fetchUrl);
      
-      // axios
-      // .get(
-      //   `${fetchUrl}`
-      // )
-      // .then((res) => {
-      //   if (res.status == 200) {
-      //     setRows(res.data)
-      //     console.log(res.data)
-      //   }
-      // })
-      // .catch((e) => {
-      //   console.log(e)
-      // })
-      // axios
-      // .get(
-      //   `http://localhost:5000/dashboard/users`
-      // )
-      // .then((res) => {
-      //   if (res.status == 200) {
-      //     console.log(res.data);
-      //     setSelectValues(res.data)
-      //   }
-      // })
-      // .catch((e) => {
-      //   console.log(e)
-      // })
-      setRows( [
-        { id: 1, first_name: 'Snow', last_name: 'Jon',  phone_number:"pack1" },
-        { id: 2, first_name: 'Lannister', last_name: 'Cersei',phone_number:"pack1" },
-        { id: 3, first_name: 'Lannister', last_name: 'Jaime', phone_number:"pack1" },
-        { id: 4, first_name: 'Stark', last_name: 'Arya',  phone_number:"pack1" },
-        { id: 5, first_name: 'Targaryen', last_name: 'Daenerys',  phone_number:"pack1" },
-        { id: 6, first_name: 'Melisandre', last_name: null,  phone_number:"pack1" },
-        { id: 7, first_name: 'Clifford', last_name: 'Ferrara',  phone_number:"pack1" },
-        { id: 8, first_name: 'Frances', last_name: 'Rossini',  phone_number:"pack1" },
-        { id: 9, first_name: 'Roxie', last_name: 'Harvey',  phone_number:"pack1"},
-      ])
-      setSelectValues([{id: 1,label:"Client1"},{id: 2,label:"Client2"},{id: 3,label:"Client3"},])
+      axios
+      .get(
+        `${fetchUrl}`
+      )
+      .then((res) => {
+        if (res.status == 200) {
+          console.log(res.data)
+          setRows(res.data)
+        }
+      })
+      .catch((e) => {
+        console.log(e)
+      })
+      axios
+      .get(
+        `http://localhost:5000/annonceurs`
+      )
+      .then((res) => {
+        if (res.status == 200) {
+          setSelectValues(res.data)
+        }
+      })
+      .catch((e) => {
+        console.log(e)
+      })
+      axios
+      .get(
+        `http://localhost:5000/categories`
+      )
+      .then((res) => {
+        if (res.status == 200) {
+          setCategories(res.data)
+        }
+      })
+      .catch((e) => {
+        console.log(e)
+      })
+      axios
+      .get(
+        `http://localhost:5000/categoriesDrink`
+      )
+      .then((res) => {
+        if (res.status == 200) {
+          setCategoriesDrinks(res.data)
+        }
+      })
+      .catch((e) => {
+        console.log(e)
+      })
       }
       React.useEffect(() => {
         getData()
       }, [ refreshParent, refresh])
+      useEffect(() => {
+        console.log(item)
+      }, [item])
   return (
     <Box sx={{ height: 500, width: '100%', padding:"15px 10px", }}>
       {/* The Dialog Section */}
       {/* Dialog Button */}
-      {info?.title && <h1>{info?.title}</h1>}
+      {info?.title && <Typography variant='h4'>{info?.title}</Typography>}
       {info?.description && <p>{info?.description}</p>}
       {add && (
         <>
@@ -129,20 +146,37 @@ export default function DataGridAds({
         </Box>
           
 
-          <Dialog open={open} onClose={handleClose}>
+          <Dialog open={open} onClose={handleClose} maxWidth={false} sx={{ minWidth: 500}}>
             <DialogTitle>{info?.DialogTitle}</DialogTitle>
 
             <DialogContent>
               <DialogContentText>{info?.DialogDescription}</DialogContentText>
-              <Box sx={{display: "grid", gridTemplateColumns:"1fr 1fr",gap:"10px 10px",margin:"10px 0"}}>
+              <FormControl fullWidth>
+                    <InputLabel id="demo-simple-select-label">annoncer</InputLabel>
+                    <Select
+                        labelId="demo-simple-select-label"
+                        id="demo-simple-select"
+                        name="idAnnonceur"
+                        type="number"
+                        label="Annoncer"
+                        onChange={handleChange}
+                    >
+                        {selectValues.map((v) => {
+                            return (
+                                <MenuItem key={v.id} value={v.id}>{v.nom} {v.prenom}</MenuItem>
+                            )
+                        })}
+                        
+                    </Select>
+                </FormControl>
+              <Box sx={{display: "grid", gridTemplateColumns:"1fr",gap:"10px 10px",margin:"10px 0"}}>
               {columns
                 ?.filter((e) => e.add)
                 .map((column) => (
-                  <>
+                  <Box key={column.id}>
                     {column.add && (column.type==="string" || column.type==="number"|| column.type=="email") &&
         
                         <TextField
-                        key={column.id}
                             id="outlined-start-adornment"
                             name={column.field}
                             type={column.type}
@@ -156,8 +190,45 @@ export default function DataGridAds({
                             }}
                         />
                         }
-                 </>
+                 </Box>
               ))}
+              <FormControl fullWidth>
+                    <InputLabel id="category">category</InputLabel>
+                    <Select
+                        labelId="category"
+                        id="demo-simple-select"
+                        type='number'
+                        name="idCategorie"
+                        label="Category"
+                        onChange={handleChange}
+                    >
+                        {categories.map((v) => {
+                            return (
+                                <MenuItem key={v.id} value={v.id}>{v.categorie}</MenuItem>
+                            )
+                        })}
+                        
+                    </Select>
+                </FormControl>
+                <FormControl fullWidth>
+                    <InputLabel id="category">category Drink</InputLabel>
+                    <Select
+                        labelId="category"
+                        id="demo-simple-select"
+                        name="idCategRecette"
+                        type="number"
+                        label="Category"
+                        onChange={handleChange}
+                    >
+                        {categoriesDrinks.map((v) => {
+                            return (
+                                <MenuItem key={v.id} value={v.id}>{v.description}</MenuItem>
+                            )
+                        })}
+                        
+                    </Select>
+                </FormControl>
+                
               </Box>
             </DialogContent>
             <DialogActions>
@@ -187,20 +258,20 @@ export default function DataGridAds({
         <DialogTitle>{info?.DialogUpdate}</DialogTitle>
         <DialogContent>
           <DialogContentText>{info?.DialogUpdateDescription}</DialogContentText>
-          <Box sx={{display: "grid", gridTemplateColumns:"1fr 1fr",gap:"10px 10px",margin:"10px 0"}}>
-          {columns
-                ?.filter((e) => e.edit)
+          
+              <Box sx={{display: "grid", gridTemplateColumns:"1fr",gap:"10px 10px",margin:"10px 0"}}>
+              {columns
+                ?.filter((e) => e.add)
                 .map((column) => (
-                  <>
-                    {column.edit && (column.type==="string" || column.type==="number"|| column.type=="email") &&
+                  <Box key={column.id}>
+                    {column.add && (column.type==="string" || column.type==="number"|| column.type=="email") &&
         
                         <TextField
-                        key={column.id}
                             id="outlined-start-adornment"
                             name={column.field}
                             type={column.type}
-                            value={item[column.field]}
                             label={column.headerName}
+                            value={item[column.field]}
                             onChange={handleChangeUpdate}
                             {...column.TextFieledProps}
                             InputProps={{
@@ -210,37 +281,55 @@ export default function DataGridAds({
                             }}
                         />
                         }
-                        
-                        
-                 </>
+                 </Box>
               ))}
               <FormControl fullWidth>
-                    <InputLabel id="demo-simple-select-label">Choose an admin</InputLabel>
+                    <InputLabel id="category">category</InputLabel>
                     <Select
-                        labelId="demo-simple-select-label"
+                        labelId="category"
                         id="demo-simple-select"
-                        name="admin"
-                        label="Administrator"
+                        type='number'
+                        name="categorie"
+                        label="Category"
+                        value={item?.categorie}
                         onChange={handleChangeUpdate}
                     >
-                        {selectValues.map((v) => {
+                        {categories.map((v) => {
                             return (
-                                <MenuItem value={v.id}>{v.label}</MenuItem>
+                                <MenuItem key={v.id} value={v.id}>{v.categorie}</MenuItem>
                             )
                         })}
                         
                     </Select>
                 </FormControl>
-          
-          </Box>
+                <FormControl fullWidth>
+                    <InputLabel id="category">category Drink</InputLabel>
+                    <Select
+                        labelId="category"
+                        id="demo-simple-select"
+                        name="categRecette"
+                        type="number"
+                        label="Category"
+                        value={item.categRecette}
+                        onChange={handleChangeUpdate}
+                    >
+                        {categoriesDrinks.map((v) => {
+                            return (
+                                <MenuItem key={v.id} value={v.id}>{v.description}</MenuItem>
+                            )
+                        })}
+                        
+                    </Select>
+                </FormControl>
+                
+              </Box>
           
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseUpdate}>Annuler</Button>
           <Button onClick={() => {
             if (editFunction){
-              console.log("-----",client);
-              editFunction(item,client)
+              editFunction(item)
               handleCloseUpdate()
             }
             handleCloseUpdate()

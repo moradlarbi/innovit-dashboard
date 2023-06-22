@@ -40,12 +40,12 @@ const AdministratorAdmin = () => {
       type: 'string',
       editable: false,
       valueGetter: (params) => {
-        return `${params.row.last_name} ${params.row.first_name}`
+        return `${params.row.nom} ${params.row.prenom}`
       },
       width: 150,
     },
     {
-      field: 'last_name',
+      field: 'nom',
       headerName: 'Last name',
       type: 'string',
       editable: false,
@@ -54,7 +54,7 @@ const AdministratorAdmin = () => {
       hide: true,
     },
     {
-      field: 'first_name',
+      field: 'prenom',
       headerName: 'First name',
       type: 'string',
       editable: false,
@@ -63,7 +63,7 @@ const AdministratorAdmin = () => {
       hide: true,
     },
     {
-      field: 'email',
+      field: 'mail',
       headerName: 'Email',
       type: 'email',
       editable: false,
@@ -72,7 +72,7 @@ const AdministratorAdmin = () => {
       width: 150,
     },
     {
-        field: 'phone_number',
+        field: 'tel',
         headerName: 'Phone number',
         type: 'string',
         editable: false,
@@ -81,7 +81,7 @@ const AdministratorAdmin = () => {
         width: 150,
       },
       {
-        field: 'password',
+        field: 'mdp',
         headerName: 'password',
         type: 'password',
         editable: false,
@@ -117,57 +117,56 @@ const AdministratorAdmin = () => {
     }
   ];
   
-  const addOne = (values,client) => {
-    console.log(client)
-    axios.post('http://localhost:3001/book', values).then((res) => {
+  const addOne = (values) => {
+    console.log(values)
+    axios.post('http://localhost:5000/auth/signup',{...values,idRole: 2, isActive: 1, idCreatedpar: 0 }).then((res) => {
       if (res.status === 201) {
         Swal.fire({
           position: "center",
           icon: "success",
-          title: `${values.name} a bien été ajouté`,
+          title: `${values.nom} a bien été ajouté`,
           showConfirmButton: false,
           timer: 1500,
         });
         setrefresh(!refresh)
-      } else if (res.status === 400) {
-        Swal.fire({
-          position: "top-end",
-          icon: "error",
-          title: `${values.name} n'a pas été ajouté`,
-          showConfirmButton: false,
-          timer: 1500,
-        });
-        console.log('bad req')
-      }
+      } 
       else {
         Swal.fire({
           position: "top-end",
           icon: "error",
-          title: `${values.name} n'a pas été ajouté`,
+          title: `${values.nom} n'a pas été ajouté`,
           showConfirmButton: false,
           timer: 1500,
         });
-      }
-        })
+      }}).catch((e) => {
+        console.log(e)
+        Swal.fire({
+          position: "top-end",
+          icon: "error",
+          title: `${values.nom} n'a pas été ajouté`,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      })
     
         console.log(values)
   }
   const deleteOne= (id) => {
     Swal.fire({
-      text: "Vous voulez vraiment supprimé l'item?",
+      text: "Vous voulez vraiment désactivé ce compte?",
       showCancelButton: true,
       confirmButtonText: 'Confirmer',
       cancelButtonText: `Annuler`,
     })
     .then((result) => {
       if (result.isConfirmed) {
-        axios.delete(`http://localhost:3001/book/${id}`)
+        axios.patch(`http://localhost:5000/users/status/${id}`,{isActive: 0})
           .then((res) => {
             if (res.status === 200) {
               Swal.fire({
                 position: "center",
                 icon: "success",
-                title: "L'item a bien été supprimé",
+                title: "Le compte a bien été désactivé",
                 showConfirmButton: false,
                 timer: 1500,
               });
@@ -176,7 +175,7 @@ const AdministratorAdmin = () => {
               Swal.fire({
                 position: "center",
                 icon: "error",
-                title: "Le item n'a pas été supprimé",
+                title: "Le compte n'a pas été désactivé",
                 showConfirmButton: false,
                 timer: 1500,
               });
@@ -186,7 +185,7 @@ const AdministratorAdmin = () => {
             Swal.fire({
               position: "top-end",
               icon: "error",
-              title: "L'item n'a pas été ajouté",
+              title: "Le compte n'a pas été désactivé",
               showConfirmButton: false,
               timer: 1500,
             });
@@ -196,12 +195,12 @@ const AdministratorAdmin = () => {
     
   };
   const updateOne = (values) => {
-    axios.put(`http://localhost:3001/api/${values.id}`, values).then((res) => {
+    axios.patch(`http://localhost:5000/users/edit/${values.id}`, values).then((res) => {
           if (res.status === 200) {
             Swal.fire({
               position: "center",
               icon: "success",
-              title: `${values.name} a bien été mis a jour`,
+              title: `${values.nom} a bien été mis a jour`,
               showConfirmButton: false,
               timer: 1500,
             });
@@ -211,7 +210,7 @@ const AdministratorAdmin = () => {
             Swal.fire({
               position: "top-end",
               icon: "error",
-              title: `${values.name} n'a pas été mis a jour`,
+              title: `${values.nom} n'a pas été mis a jour`,
               showConfirmButton: false,
               timer: 1500,
             });
@@ -219,14 +218,23 @@ const AdministratorAdmin = () => {
               console.log('bad req')
             }
            } 
+        }).catch((e) => {
+          console.log(e)
+          Swal.fire({
+            position: "top-end",
+            icon: "error",
+            title: `${values.nom} n'a pas été mis a jour`,
+            showConfirmButton: false,
+            timer: 1500,
+          });
         })
   }
   return (
     <Layout>
-    <Box sx={{ background: "#EBEEF1",marginRight:"15px", padding: "15px 10px", borderRadius:"15px"}}>
+    <Box sx={{ marginRight:"15px", padding: "15px 10px", borderRadius:"15px"}}>
       <DataGridAdmin 
       columns={columns}
-      fetchUrl=""
+      fetchUrl="http://localhost:5000/users/role/5"
       addFunction={addOne}
       editFunction={updateOne}
       {...propsInfo}

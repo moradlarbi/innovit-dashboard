@@ -4,11 +4,10 @@ import AddIcon from '@mui/icons-material/Add'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import {Box} from '@mui/material';
-import Swal from 'sweetalert2'
-import DataGridVendingAdmin from '../../src/components/DataGrids/DataGridVendingAdmin'
+import Swal from "sweetalert2"
+import DataGridAnnoncer from '../../src/components/DataGrids/DataGridAnnoncer'
 import Layout from '../../src/components/Layout'
-
-const SmartBevAdmin = () => {
+const Annoncer = () => {
   const [refresh, setrefresh] = useState(false)
   const [open, setOpen] = useState(false);
   const [item, setItem] = useState({});
@@ -20,14 +19,14 @@ const SmartBevAdmin = () => {
     setItem: setItem,
   }
   const info = {
-    title: "List of vending machines",
-    description: "View and edit your vending machines",
-    addText: 'Nouveau SmartBev',
+    title: "List of annoncers",
+    description: "View and edit your annoncers",
+    addText: 'Add an announcer',
     addIcon: <AddIcon />,
-    DialogTitle: 'Ajouter un SmartBev',
-    DialogUpdate: "Modifier un SmartBev",
-    DialogDescription: "La création d'un SmartBev et sa configuration",
-    DialogUpdateDescription: "La modification d'un SmartBev et sa configuration"
+    DialogTitle: 'Add a announcer',
+    DialogUpdate: "Edit a announcer",
+    DialogDescription: "The creation of a announcer profil",
+    DialogUpdateDescription: "Update of a announcer profil"
   }
   const propsInfo = {
     add: true,
@@ -37,69 +36,55 @@ const SmartBevAdmin = () => {
   const columns = [
     { field: 'id', headerName: 'ID', width: 90, hide: true },
     {
-      field: 'identifiant',
-      headerName: 'Identifiant',
-      type: 'string',
-      editable: false,
-      add: true,
-      edit: true,
-    },
-    {
-      field: 'capaciteGoblet',
-      headerName: 'Goblet',
-      type: 'number',
-      editable: false,
-      add: true,
-      edit: true,
-    },
-    {
-      field: 'capaciteSucre',
-      headerName: 'Sugar',
-      type: 'number',
-      editable: false,
-      add: true,
-      edit: true,
-    },
-    {
-      field: 'capaciteSpoon',
-      headerName: 'Spoon',
-      type: 'number',
-      editable: false,
-      add: true,
-      edit: true,
-    },
-    {
-      field: 'pack',
-      headerName: 'Pack',
+      field: 'name',
+      headerName: 'Name',
       type: 'string',
       editable: false,
       add: false,
       edit: false,
+      width: 150,
       valueGetter: (params) => {
-        return `PACK ${params.row.id}`
+        return `${params.row.nom} ${params.row.prenom}`
       }
     },
     {
-      field: "localisation",
-      headerName: "Région",
-      type:"string",
-      add: true,
-      edit: false,
-      valueGetter: (params) => {
-        return ` ${params.row.pack?.localisation}`
-      }
-    },
+        field: 'nom',
+        headerName: 'First Name',
+        type: 'string',
+        editable: false,
+        add: true,
+        edit: true,
+        hide: true,
+        width: 150,
+      },
     {
-      field: 'client',
-      headerName: 'Client',
-      type: 'select',
+        field: 'prenom',
+        headerName: 'Last Name',
+        type: 'string',
+        editable: false,
+        add: true,
+        edit: true,
+        hide: true,
+        width: 150,
+      },
+    {
+      field: 'mail',
+      headerName: 'Email',
+      type: 'email',
       editable: false,
-      add: false,
+      add: true,
       edit: true,
-      valueGetter: (params) => {
-        return `${params.row.entreprise?.nom}`
-      }
+      width: 150,
     },
+    {
+        field: 'tel',
+        headerName: 'Phone number',
+        type: 'string',
+        editable: false,
+        add: true,
+        edit: true,
+        width: 150,
+      },
     {
       field: "actions",
       headerName: "Actions",
@@ -127,28 +112,14 @@ const SmartBevAdmin = () => {
       }
     }
   ];
-
-
   const addOne = (values) => {
-    console.log(values);
-    axios.post('http://localhost:5000/distributeurs/add', {
-      capaciteGoblet : parseInt(values.capaciteGoblet),
-      capaciteSucre : parseInt(values.capaciteSucre),
-      capaciteSpoon : parseInt(values.capaciteSpoon),
-      identifiant: values.identifiant,
-      pack : {
-        idEntre: values.client,
-        codeverou: "",
-        localisation: values.localisation,
-        state: 1
-      }
-    }).then((res) => {
-      if (res.status === 200) {
-
+    console.log(values)
+    axios.post('http://localhost:5000/annonceurs/add', {...values, idCreatedpar: 1}).then((res) => {
+      if (res.status === 201) {
         Swal.fire({
           position: "center",
           icon: "success",
-          title: `L'ajout a bien été effectué`,
+          title: `${values.nom} a bien été ajouté`,
           showConfirmButton: false,
           timer: 1500,
         });
@@ -158,7 +129,7 @@ const SmartBevAdmin = () => {
         Swal.fire({
           position: "top-end",
           icon: "error",
-          title: `${values.name} n'a pas été ajouté`,
+          title: `${values.nom} n'a pas été ajouté`,
           showConfirmButton: false,
           timer: 1500,
         });
@@ -167,7 +138,7 @@ const SmartBevAdmin = () => {
           Swal.fire({
             position: "top-end",
             icon: "error",
-            title: `${values.name} n'a pas été ajouté`,
+            title: `${values.nom} n'a pas été ajouté`,
             showConfirmButton: false,
             timer: 1500,
           });
@@ -182,7 +153,7 @@ const SmartBevAdmin = () => {
     })
     .then((result) => {
       if (result.isConfirmed) {
-        axios.delete(`http://localhost:5000/distributeurs/delete/${id}`)
+        axios.delete(`http://localhost:5000/annonceurs/delete/${id}`)
           .then((res) => {
             if (res.status === 200) {
               Swal.fire({
@@ -207,7 +178,7 @@ const SmartBevAdmin = () => {
             Swal.fire({
               position: "top-end",
               icon: "error",
-              title: "L'item n'a pas été supprimé",
+              title: "L'item n'a pas été ajouté",
               showConfirmButton: false,
               timer: 1500,
             });
@@ -216,46 +187,47 @@ const SmartBevAdmin = () => {
     })
     
   };
-  const updateOne = (values,idClient) => {
+  const updateOne = (values) => {
     console.log(values)
-    console.log(idClient)
-    axios.patch(`http://localhost:5000/distributeurs/edit/${values.id}`, {
-      ...values, pack: {
-        ...values.pack, idEntre: idClient,localisation: values.localisation
-      }
-    }).then((res) => {
+    axios.patch(`http://localhost:5000/annonceurs/edit/${values.id}`, values).then((res) => {
           if (res.status === 200) {
             Swal.fire({
               position: "center",
               icon: "success",
-              title: `Les informations ont bien été mis a jour`,
+              title: `${values.nom} a bien été mis a jour`,
               showConfirmButton: false,
               timer: 1500,
             });
             setrefresh(!refresh)
           }
            else {
-            valide1 = false
+            Swal.fire({
+              position: "top-end",
+              icon: "error",
+              title: `${values.nom} n'a pas été mis a jour`,
+              showConfirmButton: false,
+              timer: 1500,
+            });
+            if (res.status === 400) {
+              console.log('bad req')
+            }
            } 
         }).catch((e) => {
           Swal.fire({
-            position: "center",
+            position: "top-end",
             icon: "error",
-            title: `Les informations n'ont pas été mis a jour`,
+            title: `${values.nom} n'a pas été mis a jour`,
             showConfirmButton: false,
             timer: 1500,
           });
         })
-        
-        
   }
-
   return (
     <Layout>
     <Box sx={{ marginRight:"15px", padding: "15px 10px", borderRadius:"15px"}}>
-      <DataGridVendingAdmin 
+      <DataGridAnnoncer 
       columns={columns}
-      fetchUrl="http://localhost:5000/distributeurs"
+      fetchUrl="http://localhost:5000/annonceurs"
       addFunction={addOne}
       editFunction={updateOne}
       {...propsInfo}
@@ -268,4 +240,4 @@ const SmartBevAdmin = () => {
   )
 }
 
-export default SmartBevAdmin
+export default Annoncer

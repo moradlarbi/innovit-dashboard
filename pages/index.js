@@ -1,20 +1,41 @@
 import * as React from 'react';
 import Container from '@mui/material/Container';
-import Typography from '@mui/material/Typography';
-import Box from '@mui/material/Box';
-import Link from '../src/Link';
-
+import { Box, Stack, Button, Typography, Link,InputAdornment,TextField, IconButton } from "@mui/material";
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { useState } from "react";
+import { useCtxt } from '../src/context/app.context';
+import { useRouter } from 'next/router';
 export default function Index() {
+  const {push} = useRouter()
+  const {ctxt, dispatch} = useCtxt()
+  const [states, setStates] = useState({});
+  const handleChange = (event) => {
+    setStates({ ...states, [event?.target?.name]: event?.target?.value });
+  };
+  const [showPassword, setShowPassword] = useState(false);
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const login = (values) => {
+
+  }
+  const handleSubmit = (e) => {
+    e.preventDefault();
+      login({...states})
+    }
+   React.useEffect(() => {
+    console.log(ctxt.user)
+    if (ctxt.user !== null) {
+      push("/Profil")
+    }
+    else {
+      push("/Login")
+    }
+   }, [])
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ my: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          Material UI - Next.js example
-        </Typography>
-        <Link href="/about" color="secondary">
-          Go to the about page
-        </Link>
-      </Box>
-    </Container>
+      <Box sx={{width:"100%", display:"flex", height:"100vh"}}>
+       
+        
+          
+        </Box>
   );
 }

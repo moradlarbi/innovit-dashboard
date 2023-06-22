@@ -1,30 +1,31 @@
 import {useState} from 'react'
 import axios from 'axios'
-import AddIcon from '@mui/icons-material/Add'
+import { Visibility, Reply } from '@mui/icons-material'
 import EditIcon from '@mui/icons-material/Edit'
 import DeleteIcon from '@mui/icons-material/Delete'
 import {Box} from '@mui/material';
 import Swal from "sweetalert2"
-import DataGridAnnoncer from '../../src/components/DataGrids/DataGridAnnoncer'
+import DataGridClaims from '../../src/components/DataGrids/DataGridClaims'
 import Layout from '../../src/components/Layout'
-const Annoncer = () => {
+const Claims = () => {
   const [refresh, setrefresh] = useState(false)
   const [open, setOpen] = useState(false);
+  const [open2, setOpen2] = useState(false);
   const [item, setItem] = useState({});
   
   const propsDialog = {
     openUpdate: open,
     setOpenUpdate: setOpen,
+    openReply: open2,
+    setOpenReply: setOpen2,
     item: item,
     setItem: setItem,
   }
   const info = {
-    addText: 'Add an announcer',
-    addIcon: <AddIcon />,
-    DialogTitle: 'Add a announcer',
-    DialogUpdate: "Edit a announcer",
-    DialogDescription: "The creation of a announcer profil",
-    DialogUpdateDescription: "Update of a announcer profil"
+    title: "List claims",
+    description: "View and replay to the claims",
+    DialogTitle: 'View the claim',
+    DialogUpdate: "Reply to the claim",
   }
   const propsInfo = {
     add: true,
@@ -32,51 +33,28 @@ const Annoncer = () => {
     edit: true
   }
   const columns = [
-    { field: 'id', headerName: 'ID', width: 90, hide: true },
+    { field: 'id', headerName: 'ID', width: 90 },
     {
-      field: 'name',
-      headerName: 'Name',
+        field: 'date',
+        headerName: 'Claim Date',
+        type: 'string',
+        editable: false,
+        add: true,
+        edit: true,
+        width: 150,
+      },
+    {
+      field: 'Email',
+      headerName: 'Customer',
       type: 'string',
-      editable: false,
-      add: false,
-      edit: false,
-      width: 150,
-      valueGetter: (params) => {
-        return `${params.row.first_name} ${params.row.last_name}`
-      }
-    },
-    {
-        field: 'first_name',
-        headerName: 'First Name',
-        type: 'string',
-        editable: false,
-        add: true,
-        edit: true,
-        hide: true,
-        width: 150,
-      },
-    {
-        field: 'last_name',
-        headerName: 'Last Name',
-        type: 'string',
-        editable: false,
-        add: true,
-        edit: true,
-        hide: true,
-        width: 150,
-      },
-    {
-      field: 'email',
-      headerName: 'Email',
-      type: 'email',
       editable: false,
       add: true,
       edit: true,
       width: 150,
     },
     {
-        field: 'phone_number',
-        headerName: 'Phone number',
+        field: 'message',
+        headerName: 'Claim object',
         type: 'string',
         editable: false,
         add: true,
@@ -98,21 +76,22 @@ const Annoncer = () => {
         setItem(params.row)
         setOpen(true);
       }}>
-        { info.editIcon ? info.editIcon : <EditIcon />  }
+        <Visibility />
       </div>
       <div style={{"cursor":"pointer"}} onClick={() => {
-        deleteOne(params.row.id)
+        setItem(params.row)
+        setOpen2(true);
       }}>
-        { info.deleteIcon ? info.deleteIcon : <DeleteIcon />  }
+        <Reply />
       </div>
       </Box>)
           
       }
     }
   ];
-  const addOne = (values,client) => {
-    console.log(client)
-    axios.post('http://localhost:3001/book', values).then((res) => {
+  const reply = (values,idClaim) => {
+    console.log(values)
+    axios.post('', values).then((res) => {
       if (res.status === 201) {
         Swal.fire({
           position: "center",
@@ -145,56 +124,14 @@ const Annoncer = () => {
     
         console.log(values)
   }
-  const deleteOne= (id) => {
-    Swal.fire({
-      text: "Vous voulez vraiment supprimé l'item?",
-      showCancelButton: true,
-      confirmButtonText: 'Confirmer',
-      cancelButtonText: `Annuler`,
-    })
-    .then((result) => {
-      if (result.isConfirmed) {
-        axios.delete(`http://localhost:3001/book/${id}`)
-          .then((res) => {
-            if (res.status === 200) {
-              Swal.fire({
-                position: "center",
-                icon: "success",
-                title: "L'item a bien été supprimé",
-                showConfirmButton: false,
-                timer: 1500,
-              });
-              setrefresh(!refresh)
-            } else {
-              Swal.fire({
-                position: "center",
-                icon: "error",
-                title: "Le item n'a pas été supprimé",
-                showConfirmButton: false,
-                timer: 1500,
-              });
-            }
-          })
-          .catch((err) => {
-            Swal.fire({
-              position: "top-end",
-              icon: "error",
-              title: "L'item n'a pas été ajouté",
-              showConfirmButton: false,
-              timer: 1500,
-            });
-          });
-      } 
-    })
-    
-  };
+  
   const updateOne = (values) => {
-    axios.put(`http://localhost:3001/api/${values.id}`, values).then((res) => {
+    axios.post(`https://innovit-2cs-project.onrender.com/dashboard/send-email`, values).then((res) => {
           if (res.status === 200) {
             Swal.fire({
               position: "center",
               icon: "success",
-              title: `${values.name} a bien été mis a jour`,
+              title: `Votre réponse a bien été envoyée`,
               showConfirmButton: false,
               timer: 1500,
             });
@@ -204,7 +141,7 @@ const Annoncer = () => {
             Swal.fire({
               position: "top-end",
               icon: "error",
-              title: `${values.name} n'a pas été mis a jour`,
+              title: `Une erreure est survenue lors de l'envoie`,
               showConfirmButton: false,
               timer: 1500,
             });
@@ -212,15 +149,24 @@ const Annoncer = () => {
               console.log('bad req')
             }
            } 
+        }).catch((e) => {
+          console.log(e)
+          Swal.fire({
+            position: "top-end",
+            icon: "error",
+            title: `Une erreure est survenue lors de l'envoie`,
+            showConfirmButton: false,
+            timer: 1500,
+          });
         })
   }
   return (
     <Layout>
-    <Box sx={{ background: "#EBEEF1",marginRight:"15px", padding: "15px 10px", borderRadius:"15px"}}>
-      <DataGridAnnoncer 
+    <Box sx={{ marginRight:"15px", padding: "15px 10px", borderRadius:"15px"}}>
+      <DataGridClaims 
       columns={columns}
-      fetchUrl=""
-      addFunction={addOne}
+      fetchUrl="https://innovit-2cs-project.onrender.com/dashboard/claims/3"
+      addFunction={reply}
       editFunction={updateOne}
       {...propsInfo}
       {...propsDialog}
@@ -232,4 +178,4 @@ const Annoncer = () => {
   )
 }
 
-export default Annoncer
+export default Claims

@@ -18,41 +18,10 @@ a {
 * {
   box-sizing: border-box;
 }
-
-
-
-/************* LEVELS CSS ****************/
-.level-window{
-  height: max-content;
-  width:600px;
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 3px 10px rgb(0 0 0 / 0.2);
+.swiper-button-next, .swiper-button-prev {
+  color:#000 !important;
 }
-.element-preview>p{
-  flex: 1;
-  width: 15%;
-  font-size: large;}
-.element-preview>div{
-width: 85%;
-  }
-.element-preview{
-  display: flex;
-  margin: 30px 0;
-}
-.level-container{
-  display: flex;
-  }
-.level-container>button{
-  height: max-content;
-  margin: auto 0px;
-  border: none;
-  background-color: transparent;
-  font-weight: bolder;
-  font-size: 24pt;
-  cursor: pointer;
-}
-.elements-container{
-  width: 100%;
-  padding: 0 30px;
+input, select {
+  -webkit-background-clip: text !important;
+  background-clip:  text !important;
 }

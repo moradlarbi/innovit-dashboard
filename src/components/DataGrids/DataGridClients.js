@@ -1,9 +1,10 @@
 import React, {useState, useEffect } from 'react';
-import {Box, Button, InputAdornment, TextField, Dialog, DialogActions, DialogContent,
-   DialogTitle, DialogContentText, Select, MenuItem, FormControl, InputLabel} from '@mui/material';
+import {Box, Button, InputAdornment, TextField, Dialog, DialogActions, DialogContent,Typography,
+   DialogTitle, DialogContentText, Select, MenuItem, FormControl, InputLabel, IconButton} from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import axios from 'axios';
 import SearchIcon from '@mui/icons-material/Search';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 export default function DataGridClients({
     fetchUrl,addFunction,editFunction,columns,info,refreshParent, add,edit,item,
     setItem,
@@ -24,8 +25,8 @@ export default function DataGridClients({
   const [states, setStates] = React.useState()
   const [selectValues, setSelectValues] = useState([])
   const [recherche, setRecherche] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
   const handleClickShowPassword = () => setShowPassword((show) => !show);
-  const handleClickShowPassword2 = () => setShowPassword2((show) => !show);
   const handleClickOpen = () => {
     setOpen(true)
   }
@@ -47,46 +48,20 @@ export default function DataGridClients({
     setOpenUpdate(false);
   };
     const getData = () => {
-      console.log(fetchUrl);
-     
-      // axios
-      // .get(
-      //   `${fetchUrl}`
-      // )
-      // .then((res) => {
-      //   if (res.status == 200) {
-      //     setRows(res.data)
-      //     console.log(res.data)
-      //   }
-      // })
-      // .catch((e) => {
-      //   console.log(e)
-      // })
-      // axios
-      // .get(
-      //   `http://localhost:5000/dashboard/users`
-      // )
-      // .then((res) => {
-      //   if (res.status == 200) {
-      //     console.log(res.data);
-      //     setSelectValues(res.data)
-      //   }
-      // })
-      // .catch((e) => {
-      //   console.log(e)
-      // })
-      setRows( [
-        { id: 1, first_name: 'Snow', last_name: 'Jon',  phone_number:"pack1" },
-        { id: 2, first_name: 'Lannister', last_name: 'Cersei',phone_number:"pack1" },
-        { id: 3, first_name: 'Lannister', last_name: 'Jaime', phone_number:"pack1" },
-        { id: 4, first_name: 'Stark', last_name: 'Arya',  phone_number:"pack1" },
-        { id: 5, first_name: 'Targaryen', last_name: 'Daenerys',  phone_number:"pack1" },
-        { id: 6, first_name: 'Melisandre', last_name: null,  phone_number:"pack1" },
-        { id: 7, first_name: 'Clifford', last_name: 'Ferrara',  phone_number:"pack1" },
-        { id: 8, first_name: 'Frances', last_name: 'Rossini',  phone_number:"pack1" },
-        { id: 9, first_name: 'Roxie', last_name: 'Harvey',  phone_number:"pack1"},
-      ])
-      setSelectValues([{id: 1,label:"Client1"},{id: 2,label:"Client2"},{id: 3,label:"Client3"},])
+      axios
+      .get(
+        `${fetchUrl}`
+      )
+      .then((res) => {
+        if (res.status == 200) {
+          setRows(res.data)
+          console.log(res.data)
+        }
+      })
+      .catch((e) => {
+        console.log(e)
+      })
+      
       }
       React.useEffect(() => {
         getData()
@@ -95,7 +70,7 @@ export default function DataGridClients({
     <Box sx={{ height: 500, width: '100%', padding:"15px 10px", }}>
       {/* The Dialog Section */}
       {/* Dialog Button */}
-      {info?.title && <h1>{info?.title}</h1>}
+      {info?.title && <Typography variant='h4'>{info?.title}</Typography>}
       {info?.description && <p>{info?.description}</p>}
       {add && (
         <>
@@ -138,11 +113,11 @@ export default function DataGridClients({
               {columns
                 ?.filter((e) => e.add)
                 .map((column) => (
-                  <>
+                  <Box key={column.id}>
                     {column.add && (column.type==="string" || column.type==="number"|| column.type=="email") &&
         
                         <TextField
-                        key={column.id}
+                            fullWidth
                             id="outlined-start-adornment"
                             name={column.field}
                             type={column.type}
@@ -156,7 +131,29 @@ export default function DataGridClients({
                             }}
                         />
                         }
-                 </>
+                        {column.add && column.type==="password" && <TextField
+                          key={item.id}
+                          type={showPassword ? 'text' : 'password'}
+                          name={column.field}
+                          value={item[column.field]}
+                          label={column.headerName}
+                          onChange={handleChange}
+                          {...column.TextFieledProps}
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="start">
+                                <IconButton
+                                  aria-label="toggle password visibility"
+                                  onClick={handleClickShowPassword}
+                                  edge="end"
+                                >
+                                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                                </IconButton>
+                              </InputAdornment>
+                            ),
+                          }}
+                          /> }
+                 </Box>
               ))}
               </Box>
             </DialogContent>
@@ -191,11 +188,10 @@ export default function DataGridClients({
           {columns
                 ?.filter((e) => e.edit)
                 .map((column) => (
-                  <>
+                  <Box key={column.id}>
                     {column.edit && (column.type==="string" || column.type==="number"|| column.type=="email") &&
         
                         <TextField
-                        key={column.id}
                             id="outlined-start-adornment"
                             name={column.field}
                             type={column.type}
@@ -212,7 +208,7 @@ export default function DataGridClients({
                         }
                         
                         
-                 </>
+                 </Box>
               ))}
               
           
@@ -223,8 +219,7 @@ export default function DataGridClients({
           <Button onClick={handleCloseUpdate}>Annuler</Button>
           <Button onClick={() => {
             if (editFunction){
-              console.log("-----",client);
-              editFunction(item,client)
+              editFunction(item)
               handleCloseUpdate()
             }
             handleCloseUpdate()

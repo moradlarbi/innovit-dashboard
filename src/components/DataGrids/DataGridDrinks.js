@@ -1,17 +1,17 @@
 import React, {useState, useEffect } from 'react';
 import {Box, Button, InputAdornment, TextField, Dialog, DialogActions, DialogContent,
-   DialogTitle, DialogContentText, Select, MenuItem,Typography, IconButton} from '@mui/material';
+   DialogTitle, DialogContentText, Select, MenuItem, FormControl, InputLabel,Typography} from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import axios from 'axios';
 import SearchIcon from '@mui/icons-material/Search';
-export default function DataGridAnnoncer({
+import { useCtxt } from '../../context/app.context';
+export default function DataGridDrinks({
     fetchUrl,addFunction,editFunction,columns,info,refreshParent, add,edit,item,
     setItem,
     openUpdate,
     setOpenUpdate
 }) {
+  const {ctxt} = useCtxt()
     const [columnVisible, setColumnVisible] = useState();
   useEffect(() => {
     let newColumns ={}
@@ -24,6 +24,7 @@ export default function DataGridAnnoncer({
     const [refresh, setRefresh] = useState(false)
     const [open, setOpen] = React.useState(false)
   const [states, setStates] = React.useState()
+  const [selectValues, setSelectValues] = useState([])
   const [recherche, setRecherche] = useState("")
   const handleClickOpen = () => {
     setOpen(true)
@@ -52,18 +53,39 @@ export default function DataGridAnnoncer({
       )
       .then((res) => {
         if (res.status == 200) {
-          setRows(res.data)
           console.log(res.data)
+          setRows(res.data)
         }
       })
       .catch((e) => {
         console.log(e)
       })
-      
+      axios
+      .get(
+        `http://localhost:5000/categoriesDrink`
+      )
+      .then((res) => {
+        if (res.status == 200) {
+          setSelectValues(res.data)
+        }
+      })
+      .catch((e) => {
+        console.log(e)
+      })
       }
       React.useEffect(() => {
         getData()
       }, [ refreshParent, refresh])
+      const [file, setFile] = useState()
+      const uploadImage = (e) => {
+        console.log(e.target.files)
+        if (e.target.files) {
+          setFile(e.target.files[0])
+        }
+        else {
+          console.log("error upload image")
+        }
+      }
   return (
     <Box sx={{ height: 500, width: '100%', padding:"15px 10px", }}>
       {/* The Dialog Section */}
@@ -107,11 +129,28 @@ export default function DataGridAnnoncer({
 
             <DialogContent>
               <DialogContentText>{info?.DialogDescription}</DialogContentText>
+              <FormControl fullWidth>
+                    <InputLabel id="category">Category</InputLabel>
+                    <Select
+                        labelId="category"
+                        id="demo-simple-select"
+                        name="category"
+                        label="Category"
+                        onChange={handleChange}
+                    >
+                        {selectValues.map((v) => {
+                            return (
+                                <MenuItem key={v.id} value={v.id}>{v.description}</MenuItem>
+                            )
+                        })}
+                        
+                    </Select>
+                </FormControl>
               <Box sx={{display: "grid", gridTemplateColumns:"1fr",gap:"10px 10px",margin:"10px 0",minWidth:"400px"}}>
               {columns
                 ?.filter((e) => e.add)
                 .map((column) => (
-                  <Box key={column.field}>
+                  <Box key={column.id}>
                     {column.add && (column.type==="string" || column.type==="number"|| column.type=="email") &&
         
                         <TextField
@@ -124,14 +163,35 @@ export default function DataGridAnnoncer({
                             onChange={handleChange}
                             {...column.TextFieledProps}
                             InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">{''}</InputAdornment>
+                            endAdornment: (
+                                <InputAdornment position="start">{column.type =="number" ? "DZD":""}</InputAdornment>
                             ),
                             }}
                         />
                         }
+                        
                  </Box>
               ))}
+
+              <Box>
+                <Typography>Drink Image</Typography>
+                <Box sx={{ display:"flex", gap:"10px", alignItems:"center"}} fullWidth>
+                <label htmlFor="upload-file">
+                        <input
+                            style={{ display: 'none' }}
+                            id="upload-file"
+                            name="upload-file"
+                            onChange={uploadImage}
+                            type="file"
+                        />
+                        <Box sx={{background:"#9BAEBC", color:"#fff", borderRadius:"10px", padding:"10px 10px", cursor:"pointer"}}>
+                            <Typography>Browse files</Typography>
+                        </Box>
+                    </label>
+                    <Typography sx={{ flex:"auto", background: "#EBEEF1", padding:"10px 10px", borderRadius:"10px"}}>{file?.name ?? ""}</Typography>
+                </Box>
+            
+            </Box>
               </Box>
             </DialogContent>
             <DialogActions>
@@ -147,7 +207,7 @@ export default function DataGridAnnoncer({
                 variant="contained"
                 onClick={() => {
 
-                  if (addFunction) addFunction(states)
+                  if (addFunction) addFunction({...states,  idEntreprise: ctxt?.user.idEntreprise}, file)
                   handleClose()
 
                 }}
@@ -165,8 +225,8 @@ export default function DataGridAnnoncer({
           {columns
                 ?.filter((e) => e.edit)
                 .map((column) => (
-                  <Box key={column.field}>
-                    {column.edit && (column.type==="string" || column.type==="number"|| column.type=="email") &&
+                  <Box key={column.id}>
+                    {column.edit && (column.type==="number") &&
         
                         <TextField
                         fullWidth
@@ -178,8 +238,8 @@ export default function DataGridAnnoncer({
                             onChange={handleChangeUpdate}
                             {...column.TextFieledProps}
                             InputProps={{
-                            startAdornment: (
-                                <InputAdornment position="start">{''}</InputAdornment>
+                            endAdornment: (
+                                <InputAdornment position="end">{column.type =="number" ? "DZD":""}</InputAdornment>
                             ),
                             }}
                         />
